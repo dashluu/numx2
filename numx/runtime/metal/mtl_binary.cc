@@ -1,0 +1,64 @@
+#include "mtl_context.h"
+#include "mtl_runtime.h"
+
+namespace nx::runtime::metal {
+    void MTLRuntime::run_contiguous_binary_kernel(Op *l_op, Op *r_op, Op *out_op) {
+        NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
+        MTLEncoder encoder(m_ctx.get());
+        const ArrayDescriptor &l_descriptor = l_op->descriptor();
+        const ArrayDescriptor &r_descriptor = r_op->descriptor();
+        const ArrayDescriptor &out_descriptor = out_op->descriptor();
+        const mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
+                                    static_cast<mtl_usize>(r_descriptor.offset()),
+                                    static_cast<mtl_usize>(out_descriptor.offset())};
+        encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
+        encoder.encode_array_buffer(l_descriptor);
+        encoder.encode_array_buffer(r_descriptor);
+        encoder.encode_array_buffer(out_descriptor);
+        std::string kernel_name = std::format("{}_{}", out_op->opname(), l_descriptor.dtype()->str());
+        encoder.set_pipeline_state(kernel_name);
+        usize numel = l_descriptor.numel();
+        encoder.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
+        encoder.wait_to_complete();
+        pool->release();
+    }
+
+    void MTLRuntime::run_strided_binary_kernel(Op *l_op, Op *r_op, Op *out_op) {
+        NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
+        MTLEncoder encoder(m_ctx.get());
+        const ArrayDescriptor &l_descriptor = l_op->descriptor();
+        const ArrayDescriptor &r_descriptor = r_op->descriptor();
+        const ArrayDescriptor &out_descriptor = out_op->descriptor();
+        mtl_usize ndim = l_descriptor.ndim();
+        const mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
+                                    static_cast<mtl_usize>(r_descriptor.offset()),
+                                    static_cast<mtl_usize>(out_descriptor.offset())};
+        const bool strided[] = {!l_descriptor.is_contiguous(), !r_descriptor.is_contiguous(), !out_descriptor.is_contiguous()};
+        encoder.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
+        encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
+        encoder.encode_view(l_descriptor);
+        encoder.encode_stride(l_descriptor);
+        encoder.encode_stride(r_descriptor);
+        encoder.encode_stride(out_descriptor);
+        encoder.encode_mtl_buffer(strided, sizeof(bool) * 3);
+        encoder.encode_array_buffer(l_descriptor);
+        encoder.encode_array_buffer(r_descriptor);
+        encoder.encode_array_buffer(out_descriptor);
+        std::string kernel_name = std::format("strided_{}_{}", out_op->opname(), l_descriptor.dtype()->str());
+        encoder.set_pipeline_state(kernel_name);
+        usize numel = l_descriptor.numel();
+        encoder.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
+        encoder.wait_to_complete();
+        pool->release();
+    }
+
+    void MTLRuntime::run_binary_kernel(Op *l_op, Op *r_op, Op *out_op) {
+        if (l_op->descriptor().is_contiguous() &&
+            r_op->descriptor().is_contiguous() &&
+            out_op->descriptor().is_contiguous()) {
+            run_contiguous_binary_kernel(l_op, r_op, out_op);
+        } else {
+            run_strided_binary_kernel(l_op, r_op, out_op);
+        }
+    }
+} // namespace nx::runtime::metal

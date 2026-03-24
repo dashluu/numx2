@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.30)
+project(numx)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_subdirectory(numx/memory)
+add_subdirectory(numx/foundation)
+add_subdirectory(numx/graph)
+add_subdirectory(numx/runtime)
+add_subdirectory(numx/core)
+add_subdirectory(tests)
+add_executable(main main.cc)
+target_link_libraries(main PUBLIC core)
