@@ -9,8 +9,8 @@ namespace nx::foundation {
         Signed = 2,
         Unsigned = 4,
         Bool = 8,
-        Integral = Signed | Unsigned,
-        Numeric = Float | Integral,
+        Int = Signed | Unsigned,
+        Numeric = Float | Int,
         All = Numeric | Bool
     };
 
@@ -93,15 +93,15 @@ namespace nx::foundation {
     inline bool is_signed(const DType *dtype) { return dtype->kind() == DTypeKind::Signed; }
     inline bool is_unsigned(const DType *dtype) { return dtype->kind() == DTypeKind::Unsigned; }
     inline bool is_float(const DType *dtype) { return dtype->kind() == DTypeKind::Float; }
-    inline bool is_integral(const DType *dtype) { return dtype->has_kind(DTypeKind::Integral); }
+    inline bool is_int(const DType *dtype) { return dtype->has_kind(DTypeKind::Int); }
     inline bool is_numeric(const DType *dtype) { return dtype->has_kind(DTypeKind::Numeric); }
 
     template <NumericOrBoolType T>
     usize numeric_bitcast(const DType *dtype, T constant) {
         if (is_float(dtype)) {
             // TODO: extend this to other floating-point types
-            return std::bit_cast<int>(static_cast<float>(constant));
-        } else if (is_signed(dtype)) {
+            return std::bit_cast<uint32_t>(static_cast<float>(constant));
+        } else {
             return static_cast<usize>(constant);
         }
 

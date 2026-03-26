@@ -18,9 +18,9 @@ namespace nx::runtime::metal {
         const ArrayDescriptor &l_descriptor = l_op->descriptor();
         const ArrayDescriptor &r_descriptor = r_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
-        const mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
-                                    static_cast<mtl_usize>(r_descriptor.offset()),
-                                    static_cast<mtl_usize>(out_descriptor.offset())};
+        mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
+                              static_cast<mtl_usize>(r_descriptor.offset()),
+                              static_cast<mtl_usize>(out_descriptor.offset())};
         encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
         encoder.encode_view(l_descriptor);
         encoder.encode_view(r_descriptor);
@@ -47,9 +47,9 @@ namespace nx::runtime::metal {
         const ArrayDescriptor &l_descriptor = l_op->descriptor();
         const ArrayDescriptor &r_descriptor = r_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
-        const mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
-                                    static_cast<mtl_usize>(r_descriptor.offset()),
-                                    static_cast<mtl_usize>(out_descriptor.offset())};
+        mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
+                              static_cast<mtl_usize>(r_descriptor.offset()),
+                              static_cast<mtl_usize>(out_descriptor.offset())};
         encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
         encoder.encode_view(l_descriptor);
         encoder.encode_view(r_descriptor);
@@ -92,9 +92,9 @@ namespace nx::runtime::metal {
         const ArrayDescriptor &r_descriptor = r_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
         mtl_usize ndim = l_descriptor.ndim();
-        const mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
-                                    static_cast<mtl_usize>(r_descriptor.offset()),
-                                    static_cast<mtl_usize>(out_descriptor.offset())};
+        mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
+                              static_cast<mtl_usize>(r_descriptor.offset()),
+                              static_cast<mtl_usize>(out_descriptor.offset())};
         encoder.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
         encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
         encoder.encode_view(l_descriptor);

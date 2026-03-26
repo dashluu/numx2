@@ -23,6 +23,19 @@ struct Neg {
     }
 };
 
+struct LogicNot {
+    bool operator()(bool x) const {
+        return !x;
+    }
+};
+
+struct BitwiseNot {
+    template <class T>
+    T operator()(T x) const {
+        return ~x;
+    }
+};
+
 struct Recip {
     template <class T>
     float operator()(T x) const {

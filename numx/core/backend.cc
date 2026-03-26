@@ -49,7 +49,7 @@ namespace nx::core {
             mtl_device = mtl_devices->object<MTL::Device>(i);
             auto device = foundation::make_device(i, DeviceKind::MPS);
             auto allocator = memory::make_buffer_allocator<CPUAllocator>(device->id());
-            auto memory = memory::make_buffer_memory<SFBufferCache>(std::move(allocator), 1024);
+            auto memory = memory::make_buffer_memory<SFBufferCache>(std::move(allocator));
             auto key_gen = foundation::make_random_key_generator(foundation::seed());
             auto runtime_ctx = runtime::make_runtime_context<runtime::metal::MTLContext>(mtl_device, lib_path, std::move(device), std::move(memory), std::move(key_gen));
             runtime_ctx->init_kernels();

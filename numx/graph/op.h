@@ -74,13 +74,17 @@ namespace nx::graph {
         void clear_grad();
 
     public:
-        explicit Op(ArrayDescriptor descriptor) : Primitive(), m_descriptor(std::move(descriptor)) {}
+        explicit Op(ArrayDescriptor descriptor) : Primitive(), m_descriptor(std::move(descriptor)) {
+            m_grad_enabled = descriptor.is_param();
+        }
+
         ArrayDescriptor &descriptor() { return m_descriptor; }
         virtual Opcode opcode() const = 0;
         virtual std::string_view opname() const = 0;
         bool is_grad_enabled() const { return m_grad_enabled; }
         bool is_param() const { return m_descriptor.is_param(); }
         OpPtr grad() { return m_grad; }
+        OpPtr partial_grad() { return m_partial_grad; }
         virtual bool is_graph_break() const = 0;
         OpPtr detach();
         void slice_grad(OpPtr grad, const RangeVec &ranges);

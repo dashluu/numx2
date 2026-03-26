@@ -57,7 +57,7 @@ namespace nx::memory {
         friend class SFBuffer;
 
     public:
-        SFBufferCache(BufferAllocatorPtr allocator, std::size_t max_nbytes);
+        SFBufferCache(BufferAllocatorPtr allocator) : BufferMemory(std::move(allocator)) {}
         Buffer *alloc(std::size_t nbytes) override;
         void free(Buffer *buff) override;
     };

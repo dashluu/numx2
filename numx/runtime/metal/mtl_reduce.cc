@@ -9,7 +9,7 @@ namespace nx::runtime::metal {
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
         usize numel = in_descriptor.numel();
         mtl_usize mtl_numel = numel;
-        const mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
+        mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
         encoder.encode_mtl_buffer(&mtl_numel, sizeof(mtl_usize));
         encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
         bool strided = !in_descriptor.is_contiguous();
@@ -44,9 +44,8 @@ namespace nx::runtime::metal {
 
     std::pair<usize, usize> MTLRuntime::select_reduce_col_kernel_size(usize nrow, usize ncol) {
         // TODO: find a better scheme to determine kernel selection
-        usize max_threadgroup_size = s_simd_size * s_simd_size;
-        usize col_group_size = std::min(max_threadgroup_size, std::bit_floor(ncol));
-        usize row_group_size = std::min(std::bit_floor(nrow), max_threadgroup_size / col_group_size);
+        usize col_group_size = std::min(s_simd_size, std::bit_floor(ncol));
+        usize row_group_size = std::min(std::bit_floor(nrow), s_simd_size / col_group_size);
         return {row_group_size, col_group_size};
     }
 
@@ -73,7 +72,7 @@ namespace nx::runtime::metal {
         usize nrow = std::accumulate(remaining_dims.begin(), remaining_dims.end(), uone, [&](usize acc, usize dim) { return acc * in_view[dim]; });
         usize ncol = std::accumulate(reduce_dims.begin(), reduce_dims.end(), uone, [&](usize acc, usize dim) { return acc * in_view[dim]; });
         mtl_usize mtl_ncol = ncol;
-        const mtl_usize offset[] = {static_cast<mtl_usize>(permutation_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
+        mtl_usize offset[] = {static_cast<mtl_usize>(permutation_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
         encoder.encode_mtl_buffer(&mtl_ncol, sizeof(mtl_usize));
         encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
         bool strided = !permutation_descriptor.is_contiguous();

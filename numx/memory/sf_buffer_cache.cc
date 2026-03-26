@@ -36,18 +36,18 @@ namespace nx::memory {
         }
     }
 
-    SFBufferCache::SFBufferCache(BufferAllocatorPtr allocator, std::size_t max_nbytes) : BufferMemory(std::move(allocator)) {
-        std::size_t aligned_nbytes = align_up_power_2(max_nbytes);
-        std::size_t npools = get_pool_idx(aligned_nbytes) + 1;
-        m_pools.resize(npools);
-    }
-
     Buffer *SFBufferCache::alloc(std::size_t nbytes) {
         if (nbytes == 0) {
             throw std::invalid_argument("nbytes must be > 0.");
         }
 
         std::size_t aligned_nbytes = align_up_power_2(nbytes);
+        std::size_t npools = get_pool_idx(aligned_nbytes) + 1;
+
+        if (npools > m_pools.size()) {
+            m_pools.resize(npools);
+        }
+
         auto &pool = get_pool(aligned_nbytes);
         SFBufferPtr buff;
 

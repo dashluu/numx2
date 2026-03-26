@@ -3,6 +3,10 @@
 
 namespace nx::runtime::metal {
     MTLEncoder::~MTLEncoder() {
+        for (auto &buff : m_encoded_buffs) {
+            delete[] buff;
+        }
+
         for (auto &buff : m_mtl_buffs) {
             buff->release();
         }
@@ -10,7 +14,7 @@ namespace nx::runtime::metal {
 
     void MTLEncoder::encode_mtl_buffer(const void *buff, usize size) {
         MTL::Buffer *mtl_buff = m_ctx->mtl_device()->newBuffer(buff, size, MTL::ResourceStorageModeShared, nullptr);
-        m_mtl_buffs.push_back(mtl_buff);
+        m_mtl_buffs.emplace_back(mtl_buff);
         m_encoder->setBuffer(mtl_buff, 0, m_buff_idx);
         ++m_buff_idx;
     }
@@ -18,32 +22,34 @@ namespace nx::runtime::metal {
     void MTLEncoder::encode_view(const ArrayDescriptor &descriptor) {
         const ShapeView &view = descriptor.view();
         usize ndim = descriptor.ndim();
+        mtl_usize *view_buff = new mtl_usize[ndim];
 
         for (usize i = 0; i < ndim; ++i) {
-            m_cpu_buff.push_back(view[i]);
+            view_buff[i] = view[i];
         }
 
-        usize *shape_buff = m_cpu_buff.data() + (m_cpu_buff.size() - ndim);
-        encode_mtl_buffer(shape_buff, ndim);
+        m_encoded_buffs.emplace_back(view_buff);
+        encode_mtl_buffer(view_buff, ndim * sizeof(mtl_usize));
     }
 
     void MTLEncoder::encode_stride(const ArrayDescriptor &descriptor) {
         const ShapeStride &stride = descriptor.stride();
         usize ndim = descriptor.ndim();
+        mtl_usize *stride_buff = new mtl_usize[ndim];
 
         for (usize i = 0; i < ndim; ++i) {
-            m_cpu_buff.push_back(stride[i]);
+            stride_buff[i] = stride[i];
         }
 
-        usize *stride_buff = m_cpu_buff.data() + (m_cpu_buff.size() - ndim);
-        encode_mtl_buffer(stride_buff, ndim);
+        m_encoded_buffs.emplace_back(stride_buff);
+        encode_mtl_buffer(stride_buff, ndim * sizeof(mtl_usize));
     }
 
     void MTLEncoder::set_pipeline_state(const std::string &kernel_name) {
         MTLKernel *kernel = m_ctx->kernel(kernel_name);
 
         if (!kernel) {
-            throw std::runtime_error(std::format("No kernel named {}.", kernel_name));
+            throw std::runtime_error(std::format("no kernel named {}.", kernel_name));
         }
 
         m_encoder->setComputePipelineState(kernel->state().get());

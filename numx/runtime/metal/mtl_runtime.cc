@@ -17,6 +17,12 @@ namespace nx::runtime::metal {
             run_arange_kernel(op, arange_op->start(), arange_op->step());
             break;
         }
+        case Opcode::Uniform: {
+            alloc_buffer(op);
+            auto uniform_op = static_cast<graph::UniformOp *>(op);
+            run_uniform_kernel(op, uniform_op->key(), uniform_op->low(), uniform_op->high());
+            break;
+        }
         case Opcode::Empty: {
             alloc_buffer(op);
             break;

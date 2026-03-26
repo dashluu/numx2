@@ -6,7 +6,7 @@ namespace nx::runtime::metal {
         MTLEncoder encoder(m_ctx.get());
         const ArrayDescriptor &in_descriptor = in_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
-        const mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
+        mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
         encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
         encoder.encode_array_buffer(in_descriptor);
         encoder.encode_array_buffer(out_descriptor);
@@ -24,8 +24,8 @@ namespace nx::runtime::metal {
         const ArrayDescriptor &in_descriptor = in_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
         mtl_usize ndim = in_descriptor.ndim();
-        const mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
-        const bool strided[] = {!in_descriptor.is_contiguous(), !out_descriptor.is_contiguous()};
+        mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
+        bool strided[] = {!in_descriptor.is_contiguous(), !out_descriptor.is_contiguous()};
         encoder.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
         encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
         encoder.encode_view(in_descriptor);

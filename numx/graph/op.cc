@@ -35,7 +35,7 @@ namespace nx::graph {
 
     void Op::enable_grad(bool enabled) {
         if (!is_float(m_descriptor.dtype()) && enabled) {
-            throw std::runtime_error(std::format("Only floating-point arrays can have gradients but array has type {}.", m_descriptor.dtype()->str()));
+            throw std::runtime_error(std::format("only floating-point arrays can have gradients but array has type {}.", m_descriptor.dtype()->str()));
         }
 
         m_grad_enabled = enabled;

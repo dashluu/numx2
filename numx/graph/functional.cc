@@ -5,7 +5,7 @@ namespace nx::graph {
         const ArrayDescriptor &descriptor = op->descriptor();
 
         if (descriptor.numel() != 1) {
-            throw std::runtime_error(std::format("Array must have exactly one element but has {} elements.", descriptor.numel()));
+            throw std::runtime_error(std::format("array must have exactly one element but has {} elements.", descriptor.numel()));
         }
 
         ArrayIterator iter(descriptor);

@@ -31,16 +31,26 @@ kernel void strided_binary(
     output[offset[2] + out_loc] = Op()(lhs[offset[0] + l_loc], rhs[offset[1] + r_loc]);
 }
 
-#define def_binary_kernels(opname, op, dtype, T, R) \
-template [[host_name(#opname "_" #dtype)]] [[kernel]] decltype(binary<op, T, R>) binary<op, T, R>;                              \
+#define def_binary_kernels(opname, op, dtype, T, R)     \
+template [[host_name(#opname "_" #dtype)]] [[kernel]] decltype(binary<op, T, R>) binary<op, T, R>;                                      \
 template [[host_name("strided_" #opname "_" #dtype)]] [[kernel]] decltype(strided_binary<op, T, R>) strided_binary<op, T, R>;
 
-#define def_cmp_kernels(opname, op, dtype, T)       \
-template [[host_name(#opname "_" #dtype)]] [[kernel]] decltype(binary<op, T, bool>) binary<op, T, bool>;                            \
+#define def_logic_kernels(opname, op)                   \
+template [[host_name(#opname "_b8")]] [[kernel]] decltype(binary<op, bool, bool>) binary<op, bool, bool>;                               \
+template [[host_name("strided_" #opname "_b8")]] [[kernel]] decltype(strided_binary<op, bool, bool>) strided_binary<op, bool, bool>;
+
+#define def_cmp_kernels(opname, op, dtype, T)           \
+template [[host_name(#opname "_" #dtype)]] [[kernel]] decltype(binary<op, T, bool>) binary<op, T, bool>;                                \
 template [[host_name("strided_" #opname "_" #dtype)]] [[kernel]] decltype(strided_binary<op, T, bool>) strided_binary<op, T, bool>;
 
 #define def_binary(opname, op)                      \
 def_binary_kernels(opname, op, f32, float, float);  \
+def_binary_kernels(opname, op, i32, int, int);
+
+#define def_logic(opname, op)                       \
+def_logic_kernels(opname, op);
+
+#define def_bitwise(opname, op)                     \
 def_binary_kernels(opname, op, i32, int, int);
 
 #define def_numeric_cmp(opname, op)                 \
@@ -55,6 +65,11 @@ def_binary(add, Add);
 def_binary(sub, Sub);
 def_binary(mul, Mul);
 def_binary(div, Div);
+def_logic(logic_and, LogicAnd);
+def_logic(logic_or, LogicOr);
+def_bitwise(bitwise_and, BitwiseAnd);
+def_bitwise(bitwise_or, BitwiseOr);
+def_bitwise(bitwise_xor, BitwiseXor);
 def_binary(minimum, Minimum);
 def_binary(maximum, Maximum);
 def_cmp_all(eq, Eq);

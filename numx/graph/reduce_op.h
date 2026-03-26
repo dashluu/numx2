@@ -13,10 +13,10 @@ namespace nx::graph {
 
     public:
         ReduceOp(ArrayDescriptor descriptor, OpPtr operand, ShapeDims remaining_dims, ShapeDims reduce_dims) : Op(std::move(descriptor)), m_operand(operand), m_remaining_dims(std::move(remaining_dims)), m_reduce_dims(std::move(reduce_dims)) {
-            m_grad_enabled = operand->is_grad_enabled() || operand->is_param();
+            m_grad_enabled = m_grad_enabled || operand->is_grad_enabled() || operand->is_param();
         }
 
-        PrimitiveKind kind() const override { return PrimitiveKind::Unary; }
+        PrimitiveKind kind() const override { return PrimitiveKind::Reduce; }
         std::string_view kind_str() const override { return "reduce"; }
         bool is_graph_break() const override { return false; }
         OpPtr operand() const { return m_operand; }

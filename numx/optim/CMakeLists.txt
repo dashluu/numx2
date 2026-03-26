@@ -1,0 +1,8 @@
+set(CMAKE_CXX_STANDARD 23)
+
+file(GLOB LIB_HEADER CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+file(GLOB LIB_SRC CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
+
+add_library(optim STATIC ${LIB_HEADER} ${LIB_SRC})
+target_link_libraries(optim PUBLIC core)
+target_include_directories(optim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

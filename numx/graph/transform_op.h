@@ -13,7 +13,7 @@ namespace nx::graph {
 
     public:
         TransformOp(ArrayDescriptor descriptor, OpPtr operand) : Op(std::move(descriptor)), m_operand(operand) {
-            m_grad_enabled = operand->is_grad_enabled() || operand->is_param();
+            m_grad_enabled = m_grad_enabled || operand->is_grad_enabled() || operand->is_param();
         }
 
         PrimitiveKind kind() const override { return PrimitiveKind::Transform; }

@@ -9,12 +9,15 @@ namespace nx::runtime::metal {
     using foundation::ShapeView;
     using memory::Buffer;
 
+    using mtl_usize = std::uint32_t;
+    using mtl_isize = std::int32_t;
+
     class MTLEncoder {
     private:
         MTLContext *m_ctx;
         MTL::CommandBuffer *m_cmd_buff;
         MTL::ComputeCommandEncoder *m_encoder;
-        std::vector<usize> m_cpu_buff;
+        std::vector<mtl_usize *> m_encoded_buffs;
         std::vector<MTL::Buffer *> m_mtl_buffs;
         usize m_buff_idx = 0;
 

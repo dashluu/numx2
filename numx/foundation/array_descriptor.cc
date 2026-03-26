@@ -6,11 +6,21 @@ namespace nx::foundation {
         m_shape = descriptor.m_shape;
         m_dtype = descriptor.m_dtype;
         m_device = descriptor.m_device;
-        m_is_param = false;
+        m_is_param = descriptor.m_is_param;
 
         if (descriptor.m_buff) {
             m_buff = new ArrayBufferBorrower(*descriptor.m_buff);
         }
+    }
+
+    ArrayDescriptor::ArrayDescriptor(ArrayDescriptor &&descriptor) noexcept {
+        m_shape = descriptor.m_shape;
+        m_dtype = descriptor.m_dtype;
+        m_device = descriptor.m_device;
+        m_is_param = descriptor.m_is_param;
+        m_buff = descriptor.m_buff;
+        // Note: do not remove this to prevent deleting buffer if it is an owner
+        descriptor.m_buff = nullptr;
     }
 
     ArrayDescriptor &ArrayDescriptor::operator=(const ArrayDescriptor &descriptor) {
@@ -18,11 +28,26 @@ namespace nx::foundation {
         m_shape = descriptor.m_shape;
         m_dtype = descriptor.m_dtype;
         m_device = descriptor.m_device;
-        m_is_param = false;
+        m_is_param = descriptor.m_is_param;
 
         if (descriptor.m_buff) {
             m_buff = new ArrayBufferBorrower(*descriptor.m_buff);
         }
+
+        return *this;
+    }
+
+    ArrayDescriptor &ArrayDescriptor::operator=(ArrayDescriptor &&descriptor) noexcept {
+        // Note: this method should not execute if the buffer is an owner
+        delete m_buff;
+        m_shape = descriptor.m_shape;
+        m_dtype = descriptor.m_dtype;
+        m_device = descriptor.m_device;
+        m_is_param = descriptor.m_is_param;
+        m_buff = descriptor.m_buff;
+        // Note: do not remove this to prevent deleting buffer if it is an owner
+        descriptor.m_buff = nullptr;
+        return *this;
     }
 
     void ArrayDescriptor::alloc_buffer(BufferMemory *memory) {

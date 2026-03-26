@@ -15,7 +15,8 @@ namespace nx::runtime {
         RuntimeContextPtr m_ctx;
 
         virtual void run_full_kernel(Op *op, usize constant) = 0;
-        virtual void run_arange_kernel(Op *op, isize start, isize step) = 0;
+        virtual void run_arange_kernel(Op *op, usize start, usize step) = 0;
+        virtual void run_uniform_kernel(Op *op, std::uint64_t key, usize low, usize high) = 0;
         virtual void run_binary_kernel(Op *l_op, Op *r_op, Op *out_op) = 0;
         virtual void run_gemm_kernel(Op *l_op, Op *r_op, Op *out_op) = 0;
         virtual void run_unary_kernel(Op *in_op, Op *out_op) = 0;

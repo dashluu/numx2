@@ -4,8 +4,6 @@
 #include "mtl_encoder.h"
 
 namespace nx::runtime::metal {
-    using mtl_usize = std::uint32_t;
-    using mtl_isize = std::int32_t;
     using foundation::ArrayBufferBorrower;
     using foundation::ArrayBufferOwner;
     using foundation::Buffer;
@@ -23,7 +21,8 @@ namespace nx::runtime::metal {
         static constexpr usize s_max_threadgroup_size = 1024;
 
         void run_full_kernel(Op *op, usize constant) override;
-        void run_arange_kernel(Op *op, isize start, isize step) override;
+        void run_arange_kernel(Op *op, usize start, usize step) override;
+        void run_uniform_kernel(Op *op, std::uint64_t key, usize low, usize high) override;
         void run_binary_kernel(Op *l_op, Op *r_op, Op *out_op) override;
         void run_contiguous_binary_kernel(Op *l_op, Op *r_op, Op *out_op);
         void run_strided_binary_kernel(Op *l_op, Op *r_op, Op *out_op);

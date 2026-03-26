@@ -35,7 +35,7 @@ namespace nx::core {
     }
 
     void Array::eval() {
-        if (!m_graph) {
+        if (!m_op->descriptor().is_buffer_valid()) {
             m_graph = graph::make_graph(m_op);
             m_graph->fw_sort();
             m_runtime->forward(m_graph.get());

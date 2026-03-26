@@ -22,6 +22,29 @@ struct Div {
     T operator()(T lhs, T rhs) { return lhs / rhs; }
 };
 
+struct LogicAnd {
+    bool operator()(bool lhs, bool rhs) { return lhs && rhs; }
+};
+
+struct LogicOr {
+    bool operator()(bool lhs, bool rhs) { return lhs || rhs; }
+};
+
+struct BitwiseAnd {
+    template <class T>
+    bool operator()(T lhs, T rhs) { return lhs & rhs; }
+};
+
+struct BitwiseOr {
+    template <class T>
+    bool operator()(T lhs, T rhs) { return lhs | rhs; }
+};
+
+struct BitwiseXor {
+    template <class T>
+    bool operator()(T lhs, T rhs) { return lhs ^ rhs; }
+};
+
 struct Eq {
     template <class T>
     bool operator()(T lhs, T rhs) { return lhs == rhs; }

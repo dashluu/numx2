@@ -54,9 +54,9 @@ namespace nx::core {
         const DType *dtype() const { return descriptor().dtype(); }
         const Device *device() const { return descriptor().device(); }
 
-        std::optional<const Array> grad() const {
+        std::optional<Array> grad() const {
             OpPtr grad = m_op->grad();
-            return grad ? std::optional<const Array>(Array(nx::graph::detach(grad))) : std::nullopt;
+            return grad ? std::optional<Array>(Array(graph::detach(grad))) : std::nullopt;
         }
 
         usize numel() const { return descriptor().numel(); }
@@ -72,7 +72,7 @@ namespace nx::core {
 
         usize item() {
             eval();
-            return nx::graph::item(m_op);
+            return graph::item(m_op);
         }
 
         // std::string graph_str() {
@@ -88,144 +88,155 @@ namespace nx::core {
         void eval();
         void backward();
         friend std::ostream &operator<<(std::ostream &os, Array &array) { return os << array.str(); }
-        Array detach() const { return Array(nx::graph::detach(m_op)); }
+        Array detach(bool is_param = false) const { return Array(graph::detach(m_op, is_param)); }
 
         // Element-wise operations
-        Array operator+(const Array &rhs) const { return Array(nx::graph::add(m_op, rhs.m_op)); }
+        Array operator+(const Array &rhs) const { return Array(graph::add(m_op, rhs.m_op)); }
 
         template <NumericType T>
-        Array operator+(T constant) const { return Array(nx::graph::add(m_op, constant)); }
+        Array operator+(T constant) const { return Array(graph::add(m_op, constant)); }
 
-        Array operator-(const Array &rhs) const { return Array(nx::graph::sub(m_op, rhs.m_op)); }
-
-        template <NumericType T>
-        Array operator-(T constant) const { return Array(nx::graph::sub(m_op, constant)); }
-
-        Array operator*(const Array &rhs) const { return Array(nx::graph::mul(m_op, rhs.m_op)); }
+        Array operator-(const Array &rhs) const { return Array(graph::sub(m_op, rhs.m_op)); }
 
         template <NumericType T>
-        Array operator*(T constant) const { return Array(nx::graph::mul(m_op, constant)); }
+        Array operator-(T constant) const { return Array(graph::sub(m_op, constant)); }
 
-        Array operator/(const Array &rhs) const { return Array(nx::graph::div(m_op, rhs.m_op)); }
+        Array operator*(const Array &rhs) const { return Array(graph::mul(m_op, rhs.m_op)); }
 
         template <NumericType T>
-        Array operator/(T constant) const { return Array(nx::graph::div(m_op, constant)); }
+        Array operator*(T constant) const { return Array(graph::mul(m_op, constant)); }
+
+        Array operator/(const Array &rhs) const { return Array(graph::div(m_op, rhs.m_op)); }
+
+        template <NumericType T>
+        Array operator/(T constant) const { return Array(graph::div(m_op, constant)); }
 
         Array &operator+=(const Array &rhs) {
-            m_op = nx::graph::i_add(m_op, rhs.m_op);
+            m_op = graph::i_add(m_op, rhs.m_op);
             m_graph = nullptr;
             return *this;
         }
 
         template <NumericType T>
         Array &operator+=(T constant) {
-            m_op = nx::graph::i_add(m_op, constant);
+            m_op = graph::i_add(m_op, constant);
             m_graph = nullptr;
             return *this;
         }
 
         Array &operator-=(const Array &rhs) {
-            m_op = nx::graph::i_sub(m_op, rhs.m_op);
+            m_op = graph::i_sub(m_op, rhs.m_op);
             m_graph = nullptr;
             return *this;
         }
 
         template <NumericType T>
         Array &operator-=(T constant) {
-            m_op = nx::graph::i_sub(m_op, constant);
+            m_op = graph::i_sub(m_op, constant);
             m_graph = nullptr;
             return *this;
         }
 
         Array &operator*=(const Array &rhs) {
-            m_op = nx::graph::i_mul(m_op, rhs.m_op);
+            m_op = graph::i_mul(m_op, rhs.m_op);
             m_graph = nullptr;
             return *this;
         }
 
         template <NumericType T>
         Array &operator*=(T constant) {
-            m_op = nx::graph::i_mul(m_op, constant);
+            m_op = graph::i_mul(m_op, constant);
             m_graph = nullptr;
             return *this;
         }
 
         Array &operator/=(const Array &rhs) {
-            m_op = nx::graph::i_div(m_op, rhs.m_op);
+            m_op = graph::i_div(m_op, rhs.m_op);
             m_graph = nullptr;
             return *this;
         }
 
         template <NumericType T>
         Array &operator/=(T constant) {
-            m_op = nx::graph::i_div(m_op, constant);
+            m_op = graph::i_div(m_op, constant);
             m_graph = nullptr;
             return *this;
         }
 
-        Array gemm(const Array &rhs) const { return Array(nx::graph::gemm(m_op, rhs.m_op)); }
-        Array exp(bool in_place = false) const { return Array(nx::graph::exp(m_op, in_place)); }
-        Array log(bool in_place = false) const { return Array(nx::graph::log(m_op, in_place)); }
-        Array sqrt(bool in_place = false) const { return Array(nx::graph::sqrt(m_op, in_place)); }
-        Array sq(bool in_place = false) const { return Array(nx::graph::sq(m_op, in_place)); }
-        Array neg(bool in_place = false) const { return Array(nx::graph::neg(m_op, in_place)); }
-        Array operator-() const { return Array(nx::graph::neg(m_op)); }
-        Array recip(bool in_place = false) const { return Array(nx::graph::recip(m_op, in_place)); }
-        Array sin(bool in_place = false) const { return Array(nx::graph::sin(m_op, in_place)); }
-        Array cos(bool in_place = false) const { return Array(nx::graph::cos(m_op, in_place)); }
-        Array operator==(const Array &rhs) const { return Array(nx::graph::eq(m_op, rhs.m_op)); }
-        Array operator!=(const Array &rhs) const { return Array(nx::graph::neq(m_op, rhs.m_op)); }
-        Array operator<(const Array &rhs) const { return Array(nx::graph::less(m_op, rhs.m_op)); }
-        Array operator>(const Array &rhs) const { return Array(nx::graph::greater(m_op, rhs.m_op)); }
-        Array operator<=(const Array &rhs) const { return Array(nx::graph::leq(m_op, rhs.m_op)); }
-        Array operator>=(const Array &rhs) const { return Array(nx::graph::geq(m_op, rhs.m_op)); }
-        Array minimum(const Array &rhs) const { return Array(nx::graph::minimum(m_op, rhs.m_op)); }
-        Array maximum(const Array &rhs) const { return Array(nx::graph::maximum(m_op, rhs.m_op)); }
+        Array gemm(const Array &rhs) const { return Array(graph::gemm(m_op, rhs.m_op)); }
+        Array exp(bool in_place = false) const { return Array(graph::exp(m_op, in_place)); }
+        Array log(bool in_place = false) const { return Array(graph::log(m_op, in_place)); }
+        Array sqrt(bool in_place = false) const { return Array(graph::sqrt(m_op, in_place)); }
+        Array sq(bool in_place = false) const { return Array(graph::sq(m_op, in_place)); }
+        Array neg(bool in_place = false) const { return Array(graph::neg(m_op, in_place)); }
+        Array operator-() const { return Array(graph::neg(m_op)); }
+        Array recip(bool in_place = false) const { return Array(graph::recip(m_op, in_place)); }
+        Array sin(bool in_place = false) const { return Array(graph::sin(m_op, in_place)); }
+        Array cos(bool in_place = false) const { return Array(graph::cos(m_op, in_place)); }
+        Array operator==(const Array &rhs) const { return Array(graph::eq(m_op, rhs.m_op)); }
+        Array operator!=(const Array &rhs) const { return Array(graph::neq(m_op, rhs.m_op)); }
+        Array operator<(const Array &rhs) const { return Array(graph::less(m_op, rhs.m_op)); }
+        Array operator>(const Array &rhs) const { return Array(graph::greater(m_op, rhs.m_op)); }
+        Array operator<=(const Array &rhs) const { return Array(graph::leq(m_op, rhs.m_op)); }
+        Array operator>=(const Array &rhs) const { return Array(graph::geq(m_op, rhs.m_op)); }
+        Array minimum(const Array &rhs) const { return Array(graph::minimum(m_op, rhs.m_op)); }
+        Array maximum(const Array &rhs) const { return Array(graph::maximum(m_op, rhs.m_op)); }
 
         template <NumericOrBoolType T>
-        Array operator==(T constant) const { return Array(nx::graph::eq(m_op, constant)); }
+        Array operator==(T constant) const { return Array(graph::eq(m_op, constant)); }
 
         template <NumericOrBoolType T>
-        Array operator!=(T constant) const { return Array(nx::graph::neq(m_op, constant)); }
+        Array operator!=(T constant) const { return Array(graph::neq(m_op, constant)); }
 
         template <NumericType T>
-        Array operator<(T constant) const { return Array(nx::graph::less(m_op, constant)); }
+        Array operator<(T constant) const { return Array(graph::less(m_op, constant)); }
 
         template <NumericType T>
-        Array operator>(T constant) const { return Array(nx::graph::greater(m_op, constant)); }
+        Array operator>(T constant) const { return Array(graph::greater(m_op, constant)); }
 
         template <NumericType T>
-        Array operator<=(T constant) const { return Array(nx::graph::leq(m_op, constant)); }
+        Array operator<=(T constant) const { return Array(graph::leq(m_op, constant)); }
 
         template <NumericType T>
-        Array operator>=(T constant) const { return Array(nx::graph::geq(m_op, constant)); }
+        Array operator>=(T constant) const { return Array(graph::geq(m_op, constant)); }
 
         template <NumericType T>
-        Array minimum(T constant) const { return Array(nx::graph::minimum(m_op, constant)); }
+        Array minimum(T constant) const { return Array(graph::minimum(m_op, constant)); }
 
         template <NumericType T>
-        Array maximum(T constant) const { return Array(nx::graph::maximum(m_op, constant)); }
+        Array maximum(T constant) const { return Array(graph::maximum(m_op, constant)); }
 
         // Reduction operations
-        Array sum(const ShapeDims &dims = {}) const { return Array(nx::graph::sum(m_op, dims)); }
-        Array mean(const ShapeDims &dims = {}) const { return Array(nx::graph::mean(m_op, dims)); }
-        Array max(const ShapeDims &dims = {}) const { return Array(nx::graph::max(m_op, dims)); }
-        Array min(const ShapeDims &dims = {}) const { return Array(nx::graph::min(m_op, dims)); }
-        Array argmax(const ShapeDims &dims = {}) const { return Array(nx::graph::argmax(m_op, dims)); }
-        Array argmin(const ShapeDims &dims = {}) const { return Array(nx::graph::argmin(m_op, dims)); }
+        Array sum(const ShapeDims &dims = {}) const { return Array(graph::sum(m_op, dims)); }
+        Array mean(const ShapeDims &dims = {}) const { return Array(graph::mean(m_op, dims)); }
+        Array max(const ShapeDims &dims = {}) const { return Array(graph::max(m_op, dims)); }
+        Array min(const ShapeDims &dims = {}) const { return Array(graph::min(m_op, dims)); }
+        Array argmax(const ShapeDims &dims = {}) const { return Array(graph::argmax(m_op, dims)); }
+        Array argmin(const ShapeDims &dims = {}) const { return Array(graph::argmin(m_op, dims)); }
 
         // Shape operations
-        Array broadcast(const ShapeView &view) const { return Array(nx::graph::broadcast(m_op, view)); }
-        Array broadcast_to(const ShapeView &view) const { return Array(nx::graph::broadcast_to(m_op, view)); }
-        Array slice(const RangeVec &ranges) const { return Array(nx::graph::slice(m_op, ranges)); }
-        Array reshape(const ShapeView &view) const { return Array(nx::graph::reshape(m_op, view)); }
-        Array flatten(usize start_dim, usize end_dim) const { return Array(nx::graph::flatten(m_op, start_dim, end_dim)); }
-        Array squeeze(const ShapeDims &dims = {}) const { return Array(nx::graph::squeeze(m_op, dims)); }
-        Array unsqueeze(const ShapeDims &dims = {}) const { return Array(nx::graph::unsqueeze(m_op, dims)); }
-        Array permute(const ShapeDims &dims) const { return Array(nx::graph::permute(m_op, dims)); }
-        Array transpose(usize start_dim, usize end_dim) const { return Array(nx::graph::transpose(m_op, start_dim, end_dim)); }
+        Array broadcast(const ShapeView &view) const { return Array(graph::broadcast(m_op, view)); }
+        Array broadcast_to(const ShapeView &view) const { return Array(graph::broadcast_to(m_op, view)); }
+        Array slice(const RangeVec &ranges) const { return Array(graph::slice(m_op, ranges)); }
+        Array reshape(const ShapeView &view) const { return Array(graph::reshape(m_op, view)); }
+        Array flatten(usize start_dim, usize end_dim) const { return Array(graph::flatten(m_op, start_dim, end_dim)); }
+        Array squeeze(const ShapeDims &dims = {}) const { return Array(graph::squeeze(m_op, dims)); }
+        Array unsqueeze(const ShapeDims &dims = {}) const { return Array(graph::unsqueeze(m_op, dims)); }
+        Array permute(const ShapeDims &dims) const { return Array(graph::permute(m_op, dims)); }
+        Array transpose(usize start_dim, usize end_dim) const { return Array(graph::transpose(m_op, start_dim, end_dim)); }
 
         // Type operations
-        Array astype(const DType *dtype) const { return Array(nx::graph::astype(m_op, dtype)); }
+        Array astype(const DType *dtype) const { return Array(graph::astype(m_op, dtype)); }
     };
+
+    using ArrayVec = std::vector<Array>;
 } // namespace nx::core
+
+namespace std {
+    template <>
+    struct formatter<nx::core::Array> : formatter<string> {
+        auto format(nx::core::Array &array, format_context &ctx) const {
+            return formatter<string>::format(array.str(), ctx);
+        }
+    };
+} // namespace std

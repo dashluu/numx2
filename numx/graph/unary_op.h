@@ -10,7 +10,7 @@ namespace nx::graph {
 
     public:
         UnaryOp(ArrayDescriptor descriptor, OpPtr operand, bool in_place) : Op(std::move(descriptor)), m_operand(operand), m_in_place(in_place) {
-            m_grad_enabled = operand->is_grad_enabled() || operand->is_param();
+            m_grad_enabled = m_grad_enabled || operand->is_grad_enabled() || operand->is_param();
         }
 
         PrimitiveKind kind() const override { return PrimitiveKind::Unary; }
@@ -52,7 +52,7 @@ namespace nx::graph {
 
     struct LogicNot : public UnaryOp {
     public:
-        static constexpr std::string_view s_opname = "!";
+        static constexpr std::string_view s_opname = "logic_not";
         LogicNot(ArrayDescriptor descriptor, OpPtr operand, bool in_place) : UnaryOp(std::move(descriptor), operand, in_place) {}
         Opcode opcode() const override { return Opcode::LogicNot; }
         std::string_view opname() const override { return s_opname; }
@@ -60,7 +60,7 @@ namespace nx::graph {
 
     struct BitwiseNot : public UnaryOp {
     public:
-        static constexpr std::string_view s_opname = "~";
+        static constexpr std::string_view s_opname = "bitwise_not";
         BitwiseNot(ArrayDescriptor descriptor, OpPtr operand, bool in_place) : UnaryOp(std::move(descriptor), operand, in_place) {}
         Opcode opcode() const override { return Opcode::BitwiseNot; }
         std::string_view opname() const override { return s_opname; }

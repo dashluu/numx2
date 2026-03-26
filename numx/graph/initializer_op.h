@@ -44,16 +44,16 @@ namespace nx::graph {
 
     struct ArangeOp : public InitializerOp {
     private:
-        isize m_start;
-        isize m_step;
+        usize m_start;
+        usize m_step;
 
     public:
         static constexpr std::string_view s_opname = "arange";
-        ArangeOp(ArrayDescriptor descriptor, isize start, isize step) : InitializerOp(std::move(descriptor)), m_start(start), m_step(step) {}
+        ArangeOp(ArrayDescriptor descriptor, usize start, usize step) : InitializerOp(std::move(descriptor)), m_start(start), m_step(step) {}
         Opcode opcode() const override { return Opcode::Arange; }
         std::string_view opname() const override { return s_opname; }
-        isize start() const { return m_start; }
-        isize step() const { return m_step; }
+        usize start() const { return m_start; }
+        usize step() const { return m_step; }
     };
 
     struct UniformOp : public InitializerOp {

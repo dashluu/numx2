@@ -43,6 +43,8 @@ namespace nx::runtime::metal {
 
     void MTLContext::init_unary_kernels() {
         std::vector<std::string_view> unary_name_views = {graph::NegOp::s_opname, graph::SqOp::s_opname};
+        std::vector<std::string_view> unary_int_name_views = {graph::BitwiseNot::s_opname};
+        std::vector<std::string_view> unary_bool_name_views = {graph::LogicNot::s_opname};
 
         std::vector<std::string_view> unary_float_name_views = {
             graph::SqrtOp::s_opname,
@@ -54,6 +56,10 @@ namespace nx::runtime::metal {
 
         init_kernels(unary_name_views, DTypeKind::Numeric);
         init_strided_kernels(unary_name_views, DTypeKind::Numeric);
+        init_kernels(unary_int_name_views, DTypeKind::Int);
+        init_strided_kernels(unary_int_name_views, DTypeKind::Int);
+        init_kernels(unary_bool_name_views, DTypeKind::Bool);
+        init_strided_kernels(unary_bool_name_views, DTypeKind::Bool);
         init_kernels(unary_float_name_views, DTypeKind::Float);
         init_strided_kernels(unary_float_name_views, DTypeKind::Float);
     }
@@ -69,12 +75,25 @@ namespace nx::runtime::metal {
             graph::MinimumOp::s_opname,
             graph::MaximumOp::s_opname};
 
+        std::vector<std::string_view> binary_int_name_views = {
+            graph::BitwiseAndOp::s_opname,
+            graph::BitwiseOrOp::s_opname,
+            graph::BitwiseXorOp::s_opname};
+
+        std::vector<std::string_view> binary_bool_name_views = {
+            graph::LogicAndOp::s_opname,
+            graph::LogicOrOp::s_opname};
+
         std::vector<std::string_view> equal_name_views = {
             graph::EqOp::s_opname,
             graph::NeqOp::s_opname};
 
         init_kernels(binary_name_views, DTypeKind::Numeric);
         init_strided_kernels(binary_name_views, DTypeKind::Numeric);
+        init_kernels(binary_int_name_views, DTypeKind::Int);
+        init_strided_kernels(binary_int_name_views, DTypeKind::Int);
+        init_kernels(binary_bool_name_views, DTypeKind::Bool);
+        init_strided_kernels(binary_bool_name_views, DTypeKind::Bool);
         init_kernels(equal_name_views, DTypeKind::All);
         init_strided_kernels(equal_name_views, DTypeKind::All);
     }
@@ -89,8 +108,8 @@ namespace nx::runtime::metal {
 
         for (auto &name_view : reduce_name_views) {
             auto name = std::string(name_view);
-            init_kernels(name + "_all", DTypeKind::Numeric);
-            init_kernels("strided_" + name + "_all", DTypeKind::Numeric);
+            init_kernels(std::format("{}_all", name), DTypeKind::Numeric);
+            init_kernels(std::format("strided_{}_all", name), DTypeKind::Numeric);
 
             for (uint8_t i = 1; i <= 32; i <<= 1) {
                 for (uint8_t j = 1; i * j <= 32; j <<= 1) {

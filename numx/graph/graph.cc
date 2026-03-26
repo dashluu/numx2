@@ -87,18 +87,16 @@ namespace nx::graph {
 
     void Graph::bw_sort() {
         if (m_fw_tape.empty()) {
-            throw std::runtime_error("Graph has not been forwarded.");
+            throw std::runtime_error("graph has not been forwarded.");
         }
 
         if (m_bw_tape.empty()) {
             if (m_output->descriptor().numel() > 1) {
-                throw std::runtime_error("Array must be a singleton to do gradient backpropation.");
+                throw std::runtime_error("array must be a singleton to do gradient backpropation.");
             }
 
             // Initialize output's gradient with 1's
-            if (m_output->is_grad_enabled()) {
-                m_output->update_grad_if_enabled(ones_like(m_output));
-            }
+            m_output->update_grad_if_enabled(ones_like(m_output));
 
             // Initialize gradient structure without allocating buffer memory
             // This traverses forward tape in reverse direction
@@ -111,8 +109,8 @@ namespace nx::graph {
             // Play tape backward to compute gradient
             for (auto &op : std::views::reverse(m_fw_tape)) {
                 // grad is null when backward is not implemented for op or when gradient is disabled
-                if (op->grad() != nullptr) {
-                    recur_bw_sort(op->grad().get());
+                if (op->partial_grad() != nullptr) {
+                    recur_bw_sort(op->partial_grad().get());
                 }
             }
         }

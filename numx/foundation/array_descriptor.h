@@ -22,14 +22,17 @@ namespace nx::foundation {
         }
 
         ArrayDescriptor(const ArrayDescriptor &descriptor);
+        ArrayDescriptor(ArrayDescriptor &&descriptor) noexcept;
         ~ArrayDescriptor() { invalidate_buffer(); }
         ArrayDescriptor &operator=(const ArrayDescriptor &descriptor);
+        ArrayDescriptor &operator=(ArrayDescriptor &&descriptor) noexcept;
         const Shape &shape() const { return m_shape; }
         const ShapeView &view() const { return m_shape.get_view(); }
         const ShapeStride &stride() const { return m_shape.get_stride(); }
         const DType *dtype() const { return m_dtype; }
         const Device *device() const { return m_device; }
         const ArrayBuffer &buffer() const { return *m_buff; }
+        bool is_buffer_valid() const { return m_buff != nullptr; }
         bool is_param() const { return m_is_param; }
         std::string device_name() const { return m_device->str(); }
         usize offset() const { return m_shape.get_offset(); }

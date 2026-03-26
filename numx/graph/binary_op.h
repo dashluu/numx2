@@ -18,7 +18,7 @@ namespace nx::graph {
 
     public:
         BinaryOp(ArrayDescriptor descriptor, BinaryType type, OpPtr lhs, OpPtr rhs, bool in_place) : Op(std::move(descriptor)), m_type(type), m_lhs(lhs), m_rhs(rhs), m_in_place(in_place) {
-            m_grad_enabled = lhs->is_grad_enabled() || rhs->is_grad_enabled() || lhs->is_param() || rhs->is_param();
+            m_grad_enabled = m_grad_enabled || lhs->is_grad_enabled() || rhs->is_grad_enabled() || lhs->is_param() || rhs->is_param();
         }
 
         PrimitiveKind kind() const override { return PrimitiveKind::Binary; }
@@ -140,7 +140,7 @@ namespace nx::graph {
 
     struct LogicAndOp : public ElmwiseBinaryOp {
     public:
-        static constexpr std::string_view s_opname = "&&";
+        static constexpr std::string_view s_opname = "logic_and";
 
         LogicAndOp(ArrayDescriptor descriptor, OpPtr lhs, OpPtr rhs, bool in_place) : ElmwiseBinaryOp(std::move(descriptor), lhs, rhs, in_place) {}
         Opcode opcode() const override { return Opcode::LogicAnd; }
@@ -149,7 +149,7 @@ namespace nx::graph {
 
     struct LogicOrOp : public ElmwiseBinaryOp {
     public:
-        static constexpr std::string_view s_opname = "||";
+        static constexpr std::string_view s_opname = "logic_or";
 
         LogicOrOp(ArrayDescriptor descriptor, OpPtr lhs, OpPtr rhs, bool in_place) : ElmwiseBinaryOp(std::move(descriptor), lhs, rhs, in_place) {}
         Opcode opcode() const override { return Opcode::LogicOr; }
@@ -158,7 +158,7 @@ namespace nx::graph {
 
     struct BitwiseAndOp : public ElmwiseBinaryOp {
     public:
-        static constexpr std::string_view s_opname = "&";
+        static constexpr std::string_view s_opname = "bitwise_and";
 
         BitwiseAndOp(ArrayDescriptor descriptor, OpPtr lhs, OpPtr rhs, bool in_place) : ElmwiseBinaryOp(std::move(descriptor), lhs, rhs, in_place) {}
         Opcode opcode() const override { return Opcode::BitwiseAnd; }
@@ -167,7 +167,7 @@ namespace nx::graph {
 
     struct BitwiseOrOp : public ElmwiseBinaryOp {
     public:
-        static constexpr std::string_view s_opname = "|";
+        static constexpr std::string_view s_opname = "bitwise_or";
 
         BitwiseOrOp(ArrayDescriptor descriptor, OpPtr lhs, OpPtr rhs, bool in_place) : ElmwiseBinaryOp(std::move(descriptor), lhs, rhs, in_place) {}
         Opcode opcode() const override { return Opcode::BitwiseOr; }
@@ -176,7 +176,7 @@ namespace nx::graph {
 
     struct BitwiseXorOp : public ElmwiseBinaryOp {
     public:
-        static constexpr std::string_view s_opname = "^";
+        static constexpr std::string_view s_opname = "bitwise_xor";
 
         BitwiseXorOp(ArrayDescriptor descriptor, OpPtr lhs, OpPtr rhs, bool in_place) : ElmwiseBinaryOp(std::move(descriptor), lhs, rhs, in_place) {}
         Opcode opcode() const override { return Opcode::BitwiseXor; }

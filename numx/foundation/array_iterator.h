@@ -7,7 +7,7 @@ namespace nx::foundation {
     private:
         ArrayDescriptor m_descriptor;
         std::uint8_t *m_ptr;
-        isize m_counter;
+        usize m_counter;
 
     public:
         explicit ArrayIterator(const ArrayDescriptor &descriptor) : m_descriptor(descriptor) {}
@@ -17,7 +17,7 @@ namespace nx::foundation {
         ArrayIterator &operator=(const ArrayIterator &) = delete;
         ArrayIterator &operator=(ArrayIterator &&) noexcept = delete;
         bool has_next() const { return m_counter < m_descriptor.shape().get_numel(); }
-        isize count() const { return m_counter; }
+        usize count() const { return m_counter; }
         void begin() { m_counter = 0; }
 
         std::uint8_t *next() {

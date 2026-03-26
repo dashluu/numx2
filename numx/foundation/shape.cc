@@ -367,7 +367,9 @@ namespace nx::foundation {
         ShapeStride stride = m_stride;
 
         if (dims.empty()) {
-            throw std::invalid_argument("unsqueeze expects at least 1 dimension.");
+            view.emplace_back(1);
+            stride.emplace_back(1);
+            return Shape(m_offset, view, stride);
         }
 
         usize ndim = get_ndim();

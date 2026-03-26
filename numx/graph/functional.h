@@ -2,11 +2,13 @@
 
 #include "../foundation/array_iterator.h"
 #include "../foundation/exceptions.h"
+#include "../foundation/random.h"
 #include "binary_op.h"
 #include "initializer_op.h"
 #include "reduce_op.h"
 #include "transform_op.h"
 #include "unary_op.h"
+#include <numbers>
 
 namespace nx::graph {
     using foundation::ArrayBuffer;
@@ -14,6 +16,7 @@ namespace nx::graph {
     using foundation::Device;
     using foundation::NumericOrBoolType;
     using foundation::NumericType;
+    using foundation::RandomKeyGenerator;
     using foundation::Shape;
     using foundation::uone;
     using foundation::usize;
@@ -28,10 +31,10 @@ namespace nx::graph {
     }
 
     // Creates a new array from an existing buffer, breaking the computational graph
-    inline OpPtr detach(OpPtr op) {
+    inline OpPtr detach(OpPtr op, bool is_param = false) {
         const ArrayDescriptor &descriptor = op->descriptor();
         const ArrayBuffer &buff = descriptor.buffer();
-        return from_buffer(buff.ptr(), buff.nbytes(), descriptor.shape(), descriptor.dtype(), descriptor.device(), descriptor.is_param());
+        return from_buffer(buff.ptr(), buff.nbytes(), descriptor.shape(), descriptor.dtype(), descriptor.device(), is_param);
     }
 
     inline OpPtr empty(const ShapeView &view, const DType *dtype, const Device *device, bool is_param = false) {
@@ -42,9 +45,9 @@ namespace nx::graph {
         return empty(op->descriptor().view(), dtype, device, is_param);
     }
 
-    inline OpPtr empty_like(OpPtr op) {
+    inline OpPtr empty_like(OpPtr op, bool is_param = false) {
         const ArrayDescriptor &descriptor = op->descriptor();
-        return empty(descriptor.view(), descriptor.dtype(), descriptor.device());
+        return empty(descriptor.view(), descriptor.dtype(), descriptor.device(), is_param);
     }
 
     template <NumericOrBoolType T>
@@ -65,7 +68,13 @@ namespace nx::graph {
 
     // Creates array with values from start to end with given step
     inline OpPtr arange(const ShapeView &view, isize start, isize step, const DType *dtype, const Device *device, bool is_param = false) {
-        return make_primitive<ArangeOp>(ArrayDescriptor(Shape(view), dtype, device, is_param), start, step);
+        return make_primitive<ArangeOp>(ArrayDescriptor(Shape(view), dtype, device, is_param), numeric_bitcast(dtype, start), numeric_bitcast(dtype, step));
+    }
+
+    template <NumericType T>
+    OpPtr uniform(const ShapeView &view, RandomKeyGenerator *key_gen, T low, T high, const DType *dtype, const Device *device, bool is_param = false) {
+        uint64_t key = key_gen->next();
+        return make_primitive<UniformOp>(ArrayDescriptor(Shape(view), dtype, device, is_param), key, numeric_bitcast(dtype, low), numeric_bitcast(dtype, high));
     }
 
     inline OpPtr zeros(const ShapeView &view, const DType *dtype, const Device *device, bool is_param = false) { return full(view, 0, dtype, device, is_param); }
@@ -118,7 +127,7 @@ namespace nx::graph {
     inline OpPtr sq(OpPtr in_op, bool in_place = false) { return unary<SqOp>(in_op, foundation::is_numeric, in_place); }
     inline OpPtr neg(OpPtr in_op, bool in_place = false) { return unary<NegOp>(in_op, foundation::is_numeric, in_place); }
     inline OpPtr logic_not(OpPtr in_op, bool in_place = false) { return unary<LogicNot>(in_op, foundation::is_bool, in_place); }
-    inline OpPtr bitwise_not(OpPtr in_op, bool in_place = false) { return unary<BitwiseNot>(in_op, foundation::is_integral, in_place); }
+    inline OpPtr bitwise_not(OpPtr in_op, bool in_place = false) { return unary<BitwiseNot>(in_op, foundation::is_int, in_place); }
     inline OpPtr sqrt(OpPtr in_op, bool in_place = false) { return float_unary<SqrtOp>(in_op, in_place); }
     inline OpPtr exp(OpPtr in_op, bool in_place = false) { return float_unary<ExpOp>(in_op, in_place); }
     inline OpPtr log(OpPtr in_op, bool in_place = false) { return float_unary<LogOp>(in_op, in_place); }
@@ -215,12 +224,12 @@ namespace nx::graph {
     inline OpPtr i_logic_and(OpPtr l_op, OpPtr r_op) { return in_place_binary<LogicAndOp>(l_op, r_op, foundation::is_bool); }
     inline OpPtr logic_or(OpPtr l_op, OpPtr r_op) { return binary<LogicOrOp>(l_op, r_op, foundation::is_bool); }
     inline OpPtr i_logic_or(OpPtr l_op, OpPtr r_op) { return in_place_binary<LogicOrOp>(l_op, r_op, foundation::is_bool); }
-    inline OpPtr bitwise_and(OpPtr l_op, OpPtr r_op) { return binary<BitwiseAndOp>(l_op, r_op, foundation::is_integral); }
-    inline OpPtr i_bitwise_and(OpPtr l_op, OpPtr r_op) { return in_place_binary<BitwiseAndOp>(l_op, r_op, foundation::is_integral); }
-    inline OpPtr bitwise_or(OpPtr l_op, OpPtr r_op) { return binary<BitwiseOrOp>(l_op, r_op, foundation::is_integral); }
-    inline OpPtr i_bitwise_or(OpPtr l_op, OpPtr r_op) { return in_place_binary<BitwiseOrOp>(l_op, r_op, foundation::is_integral); }
-    inline OpPtr bitwise_xor(OpPtr l_op, OpPtr r_op) { return binary<BitwiseXorOp>(l_op, r_op, foundation::is_integral); }
-    inline OpPtr i_bitwise_xor(OpPtr l_op, OpPtr r_op) { return in_place_binary<BitwiseXorOp>(l_op, r_op, foundation::is_integral); }
+    inline OpPtr bitwise_and(OpPtr l_op, OpPtr r_op) { return binary<BitwiseAndOp>(l_op, r_op, foundation::is_int); }
+    inline OpPtr i_bitwise_and(OpPtr l_op, OpPtr r_op) { return in_place_binary<BitwiseAndOp>(l_op, r_op, foundation::is_int); }
+    inline OpPtr bitwise_or(OpPtr l_op, OpPtr r_op) { return binary<BitwiseOrOp>(l_op, r_op, foundation::is_int); }
+    inline OpPtr i_bitwise_or(OpPtr l_op, OpPtr r_op) { return in_place_binary<BitwiseOrOp>(l_op, r_op, foundation::is_int); }
+    inline OpPtr bitwise_xor(OpPtr l_op, OpPtr r_op) { return binary<BitwiseXorOp>(l_op, r_op, foundation::is_int); }
+    inline OpPtr i_bitwise_xor(OpPtr l_op, OpPtr r_op) { return in_place_binary<BitwiseXorOp>(l_op, r_op, foundation::is_int); }
     inline OpPtr minimum(OpPtr l_op, OpPtr r_op) { return binary<MinimumOp>(l_op, r_op, foundation::is_numeric); }
     inline OpPtr i_minimum(OpPtr l_op, OpPtr r_op) { return in_place_binary<MinimumOp>(l_op, r_op, foundation::is_numeric); }
     inline OpPtr maximum(OpPtr l_op, OpPtr r_op) { return binary<MaximumOp>(l_op, r_op, foundation::is_numeric); }
@@ -308,6 +317,15 @@ namespace nx::graph {
     template <NumericType T>
     OpPtr maximum(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, maximum); }
 
+    template <NumericType T>
+    OpPtr normal(const ShapeView &view, RandomKeyGenerator *key_gen, T mean, T std, const DType *dtype, const Device *device, bool is_param = false) {
+        // TODO: cache second output by Box-Muller transform for future use?
+        OpPtr lhs = uniform(view, key_gen, 0, 1, dtype, device, is_param);
+        OpPtr rhs = uniform(view, key_gen, 0, 1, dtype, device, is_param);
+        OpPtr std_normal = mul(sqrt(mul(log(lhs), -2)), cos(mul(rhs, 2 * std::numbers::pi)));
+        return add(mul(std_normal, std), mean);
+    }
+
     // Converts array to different data type
     OpPtr astype(OpPtr in_op, const DType *dtype);
     // Extracts a contiguous subarray based on ranges
@@ -354,7 +372,7 @@ namespace nx::graph {
             auto iter = std::find(remaining_dims.begin(), remaining_dims.end(), dim);
 
             if (iter == remaining_dims.end()) {
-                throw std::invalid_argument(std::format("Invalid reduction dimension {} on array, either it does not exist or is duplicated.", dim));
+                throw std::invalid_argument(std::format("invalid reduction dimension {} on array, either it does not exist or is duplicated.", dim));
             } else {
                 remaining_dims.erase(iter);
                 reduce_dims.push_back(dim);
