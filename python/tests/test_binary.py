@@ -97,11 +97,11 @@ class TestBinary:
 
             # Apply inplace operation
             nx1: Array = op1(nx1, nx2)  # nx1 += nx2, etc.
-            nx1: Array = op1(nx1, nx2)  # Second time to make sure it is updated.
+            nx1 = op1(nx1, nx2)  # Second time to make sure it is updated.
 
             # Compare with NumPy
             np3: np.ndarray = op2(np3, np2)  # np1_copy += np2, etc.
-            np3: np.ndarray = op2(np3, np2)  # Second time
+            np3 = op2(np3, np2)  # Second time
             assert tuple(nx1.view) == np3.shape
             assert np.allclose(nx1.numpy(), np3, atol=1e-3, rtol=0)
 

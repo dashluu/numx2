@@ -1,3 +1,5 @@
+"""Core module"""
+
 from collections.abc import Sequence
 import enum
 

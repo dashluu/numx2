@@ -1,3 +1,5 @@
+"""Optimization module"""
+
 from collections.abc import Sequence
 
 import nx.core

@@ -1,5 +1,5 @@
 import numpy as np
-from nx.core import Array, from_numpy
+from nx.core import from_numpy
 
 
 class TestGemm:
@@ -24,8 +24,6 @@ class TestGemm:
             nx2 = from_numpy(np2)
             nx3 = nx1 @ nx2
             np3 = np1 @ np2
-            print(nx3.item())
-            print(np3)
             assert np.allclose(nx3.item(), np3, atol=1e-3, rtol=0)
 
     def test_gemm2d(self):

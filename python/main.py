@@ -26,3 +26,4 @@ def run_gemm(shape1: Sequence, shape2: Sequence):
 
 
 if __name__ == "__main__":
+    run_gemm((2, 3), (3, 4))

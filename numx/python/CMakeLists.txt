@@ -1,6 +1,10 @@
 set(CMAKE_CXX_STANDARD 23)
 
 # Set up nanobind
+execute_process(
+    COMMAND uv run which python
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE Python_EXECUTABLE)
 set(DEV_MODULE Development.Module)
 find_package(Python 3.12 COMPONENTS Interpreter ${DEV_MODULE} REQUIRED)
 

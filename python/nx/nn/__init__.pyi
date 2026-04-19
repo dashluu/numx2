@@ -1,3 +1,5 @@
+"""Neural network module"""
+
 import nx.core
 
 

@@ -1,0 +1,16 @@
+[project]
+name = "numx"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "nanobind>=2.12.0",
+    "numpy>=2.4.4",
+    "torch>=2.11.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

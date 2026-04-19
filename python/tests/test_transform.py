@@ -1,5 +1,5 @@
 import numpy as np
-from nx.core import Array, from_numpy
+from nx.core import from_numpy
 
 
 class TestTransform:

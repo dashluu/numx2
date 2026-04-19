@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 import torch.testing
 from nx.core import Array, from_numpy
