@@ -1,6 +1,18 @@
 #include "functional.h"
 
 namespace nx::core {
+    Array from_buffer(uint8_t *ptr, usize nbytes, const Shape &shape, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::from_buffer(ptr, nbytes, shape, dtype, device, is_param), runtime);
+    }
+
+    Array arange(const ShapeView &view, isize start, isize step, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::arange(view, start, step, dtype, device, is_param), runtime);
+    }
+
     Array kaiming_uniform(const ShapeView &view, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
         if (!is_float(dtype)) {
             throw IncompatDTypeForRandomFunction("kaiming_uniform", "float", dtype->str());
@@ -10,6 +22,42 @@ namespace nx::core {
         float low = -std::sqrt(6.0f / fan_in);
         float high = std::sqrt(6.0f / fan_in);
         return uniform(view, low, high, dtype, device_kind, device_id, is_param);
+    }
+
+    Array zeros(const ShapeView &view, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::zeros(view, dtype, device, is_param), runtime);
+    }
+
+    Array ones(const ShapeView &view, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::ones(view, dtype, device, is_param), runtime);
+    }
+
+    Array zeros_like(const Array &array, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::zeros_like(array.op(), dtype, device, is_param), runtime);
+    }
+
+    Array ones_like(const Array &array, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::ones_like(array.op(), dtype, device, is_param), runtime);
+    }
+
+    Array empty(const ShapeView &view, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::empty(view, dtype, device, is_param), runtime);
+    }
+
+    Array empty_like(const Array &array, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+        Runtime *runtime = backend_runtime(device_id, device_kind);
+        const Device *device = runtime->context()->device();
+        return Array(graph::empty_like(array.op(), dtype, device, is_param), runtime);
     }
 
     std::pair<usize, usize> compute_fan_in_and_fan_out(const ShapeView &view) {

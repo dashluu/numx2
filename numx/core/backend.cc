@@ -12,8 +12,8 @@ namespace nx::core {
     }
 
     Runtime *Backend::runtime(usize device_id, DeviceKind device_kind) {
-        std::size_t device_index = static_cast<std::size_t>(device_kind);
-        return m_runtimes[device_index][device_id].get();
+        std::size_t kind_index = static_cast<std::size_t>(device_kind);
+        return m_runtimes[kind_index][device_id].get();
     }
 
     void Backend::init() {

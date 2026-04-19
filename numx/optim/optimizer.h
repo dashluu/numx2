@@ -5,8 +5,8 @@
 namespace nx::optim {
     using core::Array;
     using core::ArrayVec;
-    using State = std::unordered_map<std::string, Array>;
-    using StateVec = std::vector<State>;
+    using core::State;
+    using core::StateVec;
 
     class Optimizer {
     protected:

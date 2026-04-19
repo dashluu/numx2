@@ -354,7 +354,7 @@ namespace nx::foundation {
 
         for (std::size_t i = 0; i < ranges.size(); ++i) {
             const Range &range = ranges[i];
-            usize diff = range.stop() - range.start();
+            auto diff = std::abs(static_cast<isize>(range.stop()) - static_cast<isize>(range.start()));
             view[i] = static_cast<usize>(ceil((static_cast<double>(diff)) / std::abs(range.step())));
             stride[i] = m_stride[i] * range.step();
         }

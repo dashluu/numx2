@@ -9,6 +9,13 @@ namespace nx::graph {
         }
     }
 
+    void Op::one_grad() {
+        if (!m_grad) {
+            m_grad = ones_like(nonconst());
+            m_partial_grad = m_grad;
+        }
+    }
+
     void Op::clear_grad() {
         m_grad = nullptr;
         m_partial_grad = nullptr;
@@ -16,12 +23,6 @@ namespace nx::graph {
 
     OpPtr Op::detach() { return graph::detach(nonconst()); }
     void Op::slice_grad(OpPtr grad, const RangeVec &ranges) { m_partial_grad = slice(grad, ranges); }
-
-    void Op::update_grad_if_enabled(OpPtr grad, bool add) {
-        if (is_grad_enabled()) {
-            update_grad(grad, add);
-        }
-    }
 
     void Op::update_grad(OpPtr grad, bool add) {
         zero_grad();

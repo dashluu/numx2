@@ -6,7 +6,6 @@
 namespace nx::core {
     using foundation::ArrayBuffer;
     using foundation::ArrayDescriptor;
-    using foundation::default_device_name;
     using foundation::Device;
     using foundation::DType;
     using foundation::f32;
@@ -230,6 +229,8 @@ namespace nx::core {
     };
 
     using ArrayVec = std::vector<Array>;
+    using State = std::unordered_map<std::string, Array>;
+    using StateVec = std::vector<State>;
 } // namespace nx::core
 
 namespace std {

@@ -1,14 +1,16 @@
 #include "sf_buffer_cache.h"
 
 namespace nx::memory {
-    void SFBufferPool::push(SFBufferPtr buff) {
-        buff->m_buff_idx = m_free_buffs.size();
-        m_free_buffs.emplace_back(buff);
-    }
-
     SFBufferPtr SFBufferPool::acquire() {
-        SFBufferPtr buff = m_free_buffs.back();
-        m_free_buffs.pop_back();
+        SFBufferPtr buff;
+
+        if (m_free_buffs.empty()) {
+            buff = new SFBuffer(m_allocator, m_buff_nbytes);
+        } else {
+            buff = m_free_buffs.back();
+            m_free_buffs.pop_back();
+        }
+
         buff->m_buff_idx = m_used_buffs.size();
         m_used_buffs.emplace_back(buff);
         return buff;
@@ -21,9 +23,9 @@ namespace nx::memory {
         SFBufferPtr last_buff = m_used_buffs[m_used_buffs.size() - 1];
         last_buff->m_buff_idx = buff_idx;
         m_used_buffs[buff_idx] = last_buff;
-        m_used_buffs[m_used_buffs.size() - 1] = buff;
         m_used_buffs.pop_back();
-        push(buff);
+        buff->m_buff_idx = m_free_buffs.size();
+        m_free_buffs.emplace_back(buff);
     }
 
     SFBufferPool::~SFBufferPool() {
@@ -36,6 +38,16 @@ namespace nx::memory {
         }
     }
 
+    void SFBufferCache::resize(std::size_t npools) {
+        m_pools.resize(npools);
+
+        for (std::size_t i = 0; i < npools; ++i) {
+            if (m_pools[i] == nullptr) {
+                m_pools[i] = std::make_unique<SFBufferPool>(m_allocator.get(), std::size_t(1) << i);
+            }
+        }
+    }
+
     Buffer *SFBufferCache::alloc(std::size_t nbytes) {
         if (nbytes == 0) {
             throw std::invalid_argument("nbytes must be > 0.");
@@ -45,19 +57,11 @@ namespace nx::memory {
         std::size_t npools = get_pool_idx(aligned_nbytes) + 1;
 
         if (npools > m_pools.size()) {
-            m_pools.resize(npools);
+            resize(npools);
         }
 
         auto &pool = get_pool(aligned_nbytes);
-        SFBufferPtr buff;
-
-        if (pool.empty()) {
-            buff = new SFBuffer(m_allocator.get(), nbytes);
-            pool.push(buff);
-        }
-
-        buff = pool.acquire();
-        return buff;
+        return pool.acquire();
     }
 
     void SFBufferCache::free(Buffer *buff) {

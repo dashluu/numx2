@@ -14,7 +14,7 @@
 
 namespace nx::foundation {
     using usize = std::size_t;
-    using isize = std::ptrdiff_t;
+    using isize = std::int64_t;
     constexpr usize uone = 1;
 
     template <class T>

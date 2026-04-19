@@ -44,6 +44,7 @@ namespace nx::foundation {
     };
 
     using DevicePtr = std::unique_ptr<Device>;
-    const std::string default_device_name = "mps:0";
+    const DeviceKind default_device_kind = DeviceKind::MPS;
+    const usize default_device_id = 0;
     inline DevicePtr make_device(usize id, DeviceKind kind) { return std::make_unique<Device>(id, kind); }
 } // namespace nx::foundation

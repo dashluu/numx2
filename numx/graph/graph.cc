@@ -2,6 +2,14 @@
 
 namespace nx::graph {
     void Graph::recur_fw_sort(Op *op) {
+        uintptr_t ptr = reinterpret_cast<uintptr_t>(op);
+
+        if (m_marked.contains(ptr)) {
+            return;
+        }
+
+        m_marked.insert(ptr);
+
         switch (op->kind()) {
         case PrimitiveKind::Initializer: {
             m_fw_tape.push_back(op);
@@ -41,6 +49,14 @@ namespace nx::graph {
     }
 
     void Graph::recur_bw_sort(Op *op) {
+        uintptr_t ptr = reinterpret_cast<uintptr_t>(op);
+
+        if (m_marked.contains(ptr)) {
+            return;
+        }
+
+        m_marked.insert(ptr);
+
         switch (op->kind()) {
         case PrimitiveKind::Initializer: {
             m_bw_tape.push_back(op);
@@ -96,7 +112,9 @@ namespace nx::graph {
             }
 
             // Initialize output's gradient with 1's
-            m_output->update_grad_if_enabled(ones_like(m_output));
+            if (m_output->is_grad_enabled()) {
+                m_output->one_grad();
+            }
 
             // Initialize gradient structure without allocating buffer memory
             // This traverses forward tape in reverse direction

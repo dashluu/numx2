@@ -23,13 +23,17 @@ namespace nx::graph {
         // z = -x
         // dx += dz * -1
         // dx -= dz
-        m_operand->update_grad_if_enabled(m_grad, false);
+        if (m_operand->is_grad_enabled()) {
+            m_operand->update_grad(m_grad, false);
+        }
     }
 
     void CopyOp::backward() {
         // z = x
         // dx += dz
-        m_operand->update_grad_if_enabled(m_grad);
+        if (m_operand->is_grad_enabled()) {
+            m_operand->update_grad(m_grad);
+        }
     }
 
     void ExpOp::backward() {

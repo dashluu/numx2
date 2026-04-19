@@ -7,16 +7,26 @@ namespace nx::graph {
         // z = x + y
         // dx += dz
         // dy += dz
-        m_lhs->update_grad_if_enabled(m_grad);
-        m_rhs->update_grad_if_enabled(m_grad);
+        if (m_lhs->is_grad_enabled()) {
+            m_lhs->update_grad(m_grad);
+        }
+
+        if (m_rhs->is_grad_enabled()) {
+            m_rhs->update_grad(m_grad);
+        }
     }
 
     void SubOp::backward() {
         // z = x - y
         // dx += dz
         // dy -= dz
-        m_lhs->update_grad_if_enabled(m_grad);
-        m_rhs->update_grad_if_enabled(m_grad, false);
+        if (m_lhs->is_grad_enabled()) {
+            m_lhs->update_grad(m_grad);
+        }
+
+        if (m_rhs->is_grad_enabled()) {
+            m_rhs->update_grad(m_grad, false);
+        }
     }
 
     void MulOp::backward() {

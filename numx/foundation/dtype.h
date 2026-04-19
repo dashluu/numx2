@@ -1,7 +1,6 @@
 #pragma once
 
 #include "utils.h"
-#include <array>
 
 namespace nx::foundation {
     enum struct DTypeKind {
@@ -72,22 +71,22 @@ namespace nx::foundation {
         usize min() const override { return std::bit_cast<int>(-std::numeric_limits<float>::infinity()); }
     };
 
-    struct BoolDType : public DType {
+    struct B8 : public DType {
     public:
-        BoolDType() : DType(DTypeKind::Bool, 1) {}
+        B8() : DType(DTypeKind::Bool, 1) {}
         std::string value(uint8_t *ptr) const override { return *ptr ? "true" : "false"; }
         usize bit_cast(uint8_t *ptr) const override { return *ptr; }
         usize max() const override { return std::numeric_limits<bool>::max(); }
         usize min() const override { return std::numeric_limits<bool>::min(); }
     };
 
-    inline const IntDType<std::int16_t> i16(DTypeKind::Signed, 2);
-    inline const IntDType<std::uint16_t> u16(DTypeKind::Unsigned, 2);
-    inline const IntDType<std::int32_t> i32(DTypeKind::Signed, 4);
-    inline const IntDType<std::uint32_t> u32(DTypeKind::Unsigned, 4);
+    using I16 = IntDType<std::int16_t>;
+    using I32 = IntDType<std::int32_t>;
+    inline const I16 i16(DTypeKind::Signed, 2);
+    inline const I32 i32(DTypeKind::Signed, 4);
     inline const F32 f32;
-    inline const BoolDType b8;
-    inline const std::array<const DType *, 3> all_dtypes = {&i32, &f32, &b8};
+    inline const B8 b8;
+    inline const std::vector<const DType *> all_dtypes = {&i32, &f32, &b8};
 
     inline bool is_bool(const DType *dtype) { return dtype->kind() == DTypeKind::Bool; }
     inline bool is_signed(const DType *dtype) { return dtype->kind() == DTypeKind::Signed; }

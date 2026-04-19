@@ -4,6 +4,7 @@
 
 namespace nx::graph {
     using foundation::RangeVec;
+    using foundation::usize;
 
     enum struct Opcode {
         Nop,
@@ -71,6 +72,7 @@ namespace nx::graph {
 
         OpPtr nonconst() const { return nonconst_primitive<Op>(shared_from_this()); }
         void zero_grad();
+        void one_grad();
         void clear_grad();
 
     public:
@@ -83,12 +85,11 @@ namespace nx::graph {
         virtual std::string_view opname() const = 0;
         bool is_grad_enabled() const { return m_grad_enabled; }
         bool is_param() const { return m_descriptor.is_param(); }
-        OpPtr grad() { return m_grad; }
-        OpPtr partial_grad() { return m_partial_grad; }
+        OpPtr grad() const { return m_grad; }
+        OpPtr partial_grad() const { return m_partial_grad; }
         virtual bool is_graph_break() const = 0;
         OpPtr detach();
         void slice_grad(OpPtr grad, const RangeVec &ranges);
-        void update_grad_if_enabled(OpPtr grad, bool add = true);
         void update_grad(OpPtr grad, bool add = true);
         void enable_grad(bool enabled);
     };

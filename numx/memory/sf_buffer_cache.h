@@ -24,16 +24,17 @@ namespace nx::memory {
 
     class SFBufferPool {
     private:
+        BufferAllocator *m_allocator;
+        std::size_t m_buff_nbytes;
         std::vector<SFBufferPtr> m_free_buffs;
         std::vector<SFBufferPtr> m_used_buffs;
 
-        void push(SFBufferPtr buff);
         SFBufferPtr acquire();
         void release(SFBufferPtr buff);
         friend class SFBufferCache;
 
     public:
-        SFBufferPool() = default;
+        SFBufferPool(BufferAllocator *allocator, std::size_t buff_nbytes) : m_allocator(allocator), m_buff_nbytes(buff_nbytes) {}
         SFBufferPool(const SFBufferPool &) = delete;
         SFBufferPool(SFBufferPool &&) noexcept = default;
         ~SFBufferPool();
@@ -45,15 +46,16 @@ namespace nx::memory {
 
     class SFBufferCache : public BufferMemory {
     private:
-        std::vector<SFBufferPool> m_pools;
+        std::vector<std::unique_ptr<SFBufferPool>> m_pools;
 
         static std::size_t get_pool_idx(std::size_t nbytes) { return std::bit_width(nbytes - 1); }
 
         SFBufferPool &get_pool(std::size_t nbytes) {
             std::size_t pool_idx = get_pool_idx(nbytes);
-            return m_pools.at(pool_idx);
+            return *m_pools.at(pool_idx);
         }
 
+        void resize(std::size_t npools);
         friend class SFBuffer;
 
     public:

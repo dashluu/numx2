@@ -23,13 +23,13 @@ namespace nx::foundation {
         IncompatDevicesForOp(std::string_view opname, std::string_view l_device_str, std::string_view r_device_str) : std::invalid_argument(std::format("cannot run operator {} on incompatible devices {} and {}.", opname, l_device_str, r_device_str)) {}
     };
 
-    class IndexOutOfRange : public std::out_of_range {
-    public:
-        IndexOutOfRange(usize index, usize start, usize stop) : std::out_of_range(std::format("index {} is out of range [{}, {}).", index, start, stop)) {}
-    };
-
     class IncompatDTypeForRandomFunction : public std::invalid_argument {
     public:
-        IncompatDTypeForRandomFunction(std::string_view function_name, std::string_view expected_dtype_str, std::string_view input_dtype_str) : std::invalid_argument(std::format("{}() only accepts {} data type but got {}.", function_name, expected_dtype_str, input_dtype_str)) {}
+        IncompatDTypeForRandomFunction(std::string_view function_name, std::string_view expected_dtype_str, std::string_view actual_dtype_str) : std::invalid_argument(std::format("{}() only accepts {} data type but got {}.", function_name, expected_dtype_str, actual_dtype_str)) {}
+    };
+
+    class NanobindInvalidArgumentType : public std::invalid_argument {
+    public:
+        NanobindInvalidArgumentType(std::string_view expected_type_name, std::string_view actual_type_name) : std::invalid_argument(std::format("expected an argument of type {} but received an argument of type {}.", expected_type_name, actual_type_name)) {}
     };
 } // namespace nx::foundation

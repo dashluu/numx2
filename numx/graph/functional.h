@@ -13,6 +13,7 @@
 namespace nx::graph {
     using foundation::ArrayBuffer;
     using foundation::ArrayIterator;
+    using foundation::b8;
     using foundation::Device;
     using foundation::NumericOrBoolType;
     using foundation::NumericType;
@@ -211,6 +212,35 @@ namespace nx::graph {
         return make_primitive<O>(out_descriptor, l_op, broadcast_r_op, true);
     }
 
+    template <class O>
+    OpPtr cmp(OpPtr l_op, OpPtr r_op, bool (*check_dtype)(const DType *)) {
+        const ArrayDescriptor &l_descriptor = l_op->descriptor();
+        const ArrayDescriptor &r_descriptor = r_op->descriptor();
+        const ShapeView &l_view = l_descriptor.view();
+        const ShapeView &r_view = r_descriptor.view();
+        const DType *l_dtype = l_descriptor.dtype();
+        const DType *r_dtype = r_descriptor.dtype();
+        const Device *l_device = l_descriptor.device();
+        const Device *r_device = r_descriptor.device();
+
+        if (!l_descriptor.shape().broadcastable(r_view)) {
+            throw foundation::IncompatShapesForOp(O::s_opname, foundation::join_nums(l_view), foundation::join_nums(r_view));
+        }
+
+        if ((check_dtype && !check_dtype(l_dtype)) || *l_dtype != *r_dtype) {
+            throw foundation::IncompatDTypesForOp(O::s_opname, l_dtype->str(), r_dtype->str());
+        }
+
+        if (l_device != r_device) {
+            throw foundation::IncompatDevicesForOp(O::s_opname, l_device->str(), r_device->str());
+        }
+
+        OpPtr broadcast_l_op = broadcast(l_op, r_view);
+        OpPtr broadcast_r_op = broadcast(r_op, l_view);
+        ArrayDescriptor out_descriptor(Shape(broadcast_l_op->descriptor().view()), &b8, l_device, false);
+        return make_primitive<O>(out_descriptor, broadcast_l_op, broadcast_r_op, false);
+    }
+
     // Element-wise binary operations
     inline OpPtr add(OpPtr l_op, OpPtr r_op) { return binary<AddOp>(l_op, r_op, foundation::is_numeric); }
     inline OpPtr i_add(OpPtr l_op, OpPtr r_op) { return in_place_binary<AddOp>(l_op, r_op, foundation::is_numeric); }
@@ -238,12 +268,12 @@ namespace nx::graph {
     OpPtr gemm(OpPtr l_op, OpPtr r_op);
 
     // Comparison operations (eq, neq, less, greater, leq, geq)
-    inline OpPtr eq(OpPtr l_op, OpPtr r_op) { return binary<EqOp>(l_op, r_op, nullptr); }
-    inline OpPtr neq(OpPtr l_op, OpPtr r_op) { return binary<NeqOp>(l_op, r_op, nullptr); }
-    inline OpPtr less(OpPtr l_op, OpPtr r_op) { return binary<LessOp>(l_op, r_op, foundation::is_numeric); }
-    inline OpPtr greater(OpPtr l_op, OpPtr r_op) { return binary<GreaterOp>(l_op, r_op, foundation::is_numeric); }
-    inline OpPtr leq(OpPtr l_op, OpPtr r_op) { return binary<LessOp>(l_op, r_op, foundation::is_numeric); }
-    inline OpPtr geq(OpPtr l_op, OpPtr r_op) { return binary<GreaterOp>(l_op, r_op, foundation::is_numeric); }
+    inline OpPtr eq(OpPtr l_op, OpPtr r_op) { return cmp<EqOp>(l_op, r_op, nullptr); }
+    inline OpPtr neq(OpPtr l_op, OpPtr r_op) { return cmp<NeqOp>(l_op, r_op, nullptr); }
+    inline OpPtr less(OpPtr l_op, OpPtr r_op) { return cmp<LessOp>(l_op, r_op, foundation::is_numeric); }
+    inline OpPtr greater(OpPtr l_op, OpPtr r_op) { return cmp<GreaterOp>(l_op, r_op, foundation::is_numeric); }
+    inline OpPtr leq(OpPtr l_op, OpPtr r_op) { return cmp<LeqOp>(l_op, r_op, foundation::is_numeric); }
+    inline OpPtr geq(OpPtr l_op, OpPtr r_op) { return cmp<GeqOp>(l_op, r_op, foundation::is_numeric); }
 
     template <NumericType T>
     OpPtr add(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, add); }
@@ -312,6 +342,12 @@ namespace nx::graph {
     OpPtr greater(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, greater); }
 
     template <NumericType T>
+    OpPtr leq(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, leq); }
+
+    template <NumericType T>
+    OpPtr geq(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, geq); }
+
+    template <NumericType T>
     OpPtr minimum(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, minimum); }
 
     template <NumericType T>
@@ -375,7 +411,7 @@ namespace nx::graph {
                 throw std::invalid_argument(std::format("invalid reduction dimension {} on array, either it does not exist or is duplicated.", dim));
             } else {
                 remaining_dims.erase(iter);
-                reduce_dims.push_back(dim);
+                reduce_dims.emplace_back(dim);
             }
         }
 
