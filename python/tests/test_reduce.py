@@ -1,29 +1,9 @@
 import torch
-import torch.testing
 from nx.core import Array, from_numpy
+from utils import torch_assert_array
 
 
 class TestReduce:
-    @staticmethod
-    def elmwise_assert(array: torch.Tensor, tensor: torch.Tensor, atol=1e-4, rtol=1e-3):
-        try:
-            torch.testing.assert_close(array, tensor, atol=atol, rtol=rtol)
-        except AssertionError as e:
-            print(f"Tensors not close: {e}")
-            # Find mismatched indices
-            mask = torch.isclose(array, tensor, atol=atol, rtol=rtol)
-            if array.ndim > 1:
-                entry = torch.where(~mask)
-                print("Mismatched values:")
-                print("array:", array[entry].double())
-                print("tensor:", tensor[entry].double())
-            else:
-                entry = torch.where(~mask)[0]
-                print("Mismatched values:")
-                print("array:", array[entry].double())
-                print("tensor:", tensor[entry].double())
-            raise  # Re-raise the assertion error
-
     def reduce_basic(self, op1, op2):
         # Create test data
         test_cases = [
@@ -40,7 +20,7 @@ class TestReduce:
             nx1 = from_numpy(t1.numpy())
             nx2: Array = op1(nx1)
             t2: torch.Tensor = op2(t1)
-            TestReduce.elmwise_assert(nx2.torch(), t2)
+            torch_assert_array(nx2, t2)
 
     def reduce_2d(self, op1, op2):
         # Test cases with different dimensions
@@ -64,7 +44,7 @@ class TestReduce:
                 nx1 = from_numpy(t1.numpy())
                 nx2: Array = op1(nx1, [dim])
                 t2: torch.Tensor = op2(t1, dim)
-                TestReduce.elmwise_assert(nx2.torch(), t2)
+                torch_assert_array(nx2, t2)
 
     def reduce_multidim(self, op1, op2):
         # Test cases with different shapes
@@ -84,7 +64,7 @@ class TestReduce:
             nx1 = from_numpy(t1.numpy())
             nx2: Array = op1(nx1, dim)
             t2: torch.Tensor = op2(t1, dim)
-            TestReduce.elmwise_assert(nx2.torch(), t2)
+            torch_assert_array(nx2, t2)
 
     def arg_reduce_in_multidim_array(self, op1, op2):
         # Test cases with different shapes
@@ -105,7 +85,7 @@ class TestReduce:
             nx2: Array = op1(nx1, dim)
             # Note: PyTorch does not currently support multiple-dimension argmax and argmin
             t2: torch.Tensor = op2(t1, dim=dim[0])
-            TestReduce.elmwise_assert(nx2.torch(), t2)
+            torch_assert_array(nx2, t2)
 
     def test_sum_basic(self):
         """Test basic sum reduction without specified dimensions"""

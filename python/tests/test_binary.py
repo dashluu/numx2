@@ -4,26 +4,11 @@ import operator
 
 import numpy as np
 from nx.core import Array, from_numpy
-
-
-def randn(shape) -> np.ndarray:
-    return np.random.randn(*shape).astype(np.float32)
-
-
-def nonzero_randn(shape) -> np.ndarray:
-    array = randn(shape)
-    # Replace zeros with small random values
-    zero_mask = array == 0
-    array[zero_mask] = np.random.uniform(0.1, 1.0, size=np.count_nonzero(zero_mask))
-    return array
-
-
-def positive_randn(shape) -> np.ndarray:
-    return np.abs(nonzero_randn(shape))
+from utils import np_assert_array
 
 
 class TestBinary:
-    def binary_no_broadcast(self, name: str, op1, op2, gen_fn=randn):
+    def binary_no_broadcast(self, name: str, op1, op2):
         print(f"{name}:")
 
         test_cases = [
@@ -37,16 +22,15 @@ class TestBinary:
 
         for shape in test_cases:
             print(f"Testing shape: {shape}")
-            np1 = gen_fn(shape)
-            np2 = gen_fn(shape)
+            np1 = np.random.randn(*shape).astype(np.float32)
+            np2 = np.random.randn(*shape).astype(np.float32)
             nx1 = from_numpy(np1)
             nx2 = from_numpy(np2)
             nx3: Array = op1(nx1, nx2)
             np3: np.ndarray = op2(np1, np2)
-            assert tuple(nx3.view) == np3.shape
-            assert np.allclose(nx3.numpy(), np3, atol=1e-3, rtol=0)
+            np_assert_array(nx3, np3)
 
-    def binary_with_broadcast(self, name: str, op1, op2, gen_fn=randn):
+    def binary_with_broadcast(self, name: str, op1, op2):
         print(f"{name} with broadcast:")
 
         # Test cases with different broadcasting scenarios
@@ -63,16 +47,15 @@ class TestBinary:
 
         for shape1, shape2, expected_shape in test_cases:
             print(f"Testing shapes: {shape1}, {shape2} -> {expected_shape}")
-            np1 = gen_fn(shape1)
-            np2 = gen_fn(shape2)
+            np1 = np.random.randn(*shape1).astype(np.float32)
+            np2 = np.random.randn(*shape2).astype(np.float32)
             nx1 = from_numpy(np1)
             nx2 = from_numpy(np2)
             nx3: Array = op1(nx1, nx2)
             np3: np.ndarray = op2(np1, np2)
-            assert tuple(nx3.view) == np3.shape
-            assert np.allclose(nx3.numpy(), np3, atol=1e-3, rtol=0)
+            np_assert_array(nx3, np3)
 
-    def binary_inplace(self, name: str, op1, op2, gen_fn=randn):
+    def binary_inplace(self, name: str, op1, op2):
         print(f"{name} inplace:")
 
         test_cases = [
@@ -87,25 +70,23 @@ class TestBinary:
         for shape in test_cases:
             print(f"Testing shape: {shape}")
             # Generate inputs
-            np1: np.ndarray = gen_fn(shape)
-            np2: np.ndarray = gen_fn(shape)
-            np3 = np1.copy()  # Keep copy for numpy comparison
+            np1 = np.random.randn(*shape).astype(np.float32)
+            np2 = np.random.randn(*shape).astype(np.float32)
 
             # Create arrays
             nx1 = from_numpy(np1)
             nx2 = from_numpy(np2)
 
             # Apply inplace operation
-            nx1: Array = op1(nx1, nx2)  # nx1 += nx2, etc.
-            nx1 = op1(nx1, nx2)  # Second time to make sure it is updated.
+            nx3: Array = op1(nx1, nx2)  # nx1 += nx2, etc.
+            nx3 = op1(nx3, nx2)  # Second time to make sure it is updated.
 
             # Compare with NumPy
-            np3: np.ndarray = op2(np3, np2)  # np1_copy += np2, etc.
+            np3: np.ndarray = op2(np1.copy(), np2)  # np1_copy += np2, etc.
             np3 = op2(np3, np2)  # Second time
-            assert tuple(nx1.view) == np3.shape
-            assert np.allclose(nx1.numpy(), np3, atol=1e-3, rtol=0)
+            np_assert_array(nx3, np3)
 
-    def binary_inplace_broadcast(self, name: str, op1, op2, gen_fn=randn):
+    def binary_inplace_broadcast(self, name: str, op1, op2):
         print(f"{name} inplace broadcast:")
 
         test_cases = [
@@ -119,24 +100,22 @@ class TestBinary:
             ([1, 47, 19, 63, 2], [1, 2]),
         ]
 
-        for lshape, rshape in test_cases:
-            print(f"Testing: {lshape} @= {rshape}")
+        for shape1, shape2 in test_cases:
+            print(f"Testing: {shape1} @= {shape2}")
 
             # Generate inputs
-            np1: np.ndarray = gen_fn(lshape)
-            np2: np.ndarray = gen_fn(rshape)
-            np3 = np1.copy()
+            np1 = np.random.randn(*shape1).astype(np.float32)
+            np2 = np.random.randn(*shape2).astype(np.float32)
 
             # Create arrays
             nx1 = from_numpy(np1)
             nx2 = from_numpy(np2)
 
             # Apply inplace operation
-            nx1: Array = op1(nx1, nx2)
+            nx3: Array = op1(nx1, nx2)
             # Compare with NumPy
-            np3: np.ndarray = op2(np3, np2)
-            assert tuple(nx1.view) == np3.shape
-            assert np.allclose(nx1.numpy(), np3, atol=1e-3, rtol=0)
+            np3: np.ndarray = op2(np1.copy(), np2)
+            np_assert_array(nx3, np3)
 
     def test_add(self):
         self.binary_no_broadcast("add", operator.add, operator.add)

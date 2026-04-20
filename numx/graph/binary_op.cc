@@ -8,11 +8,11 @@ namespace nx::graph {
         // dx += dz
         // dy += dz
         if (m_lhs->is_grad_enabled()) {
-            m_lhs->update_grad(m_grad);
+            m_lhs->zero_and_update_grad(m_grad);
         }
 
         if (m_rhs->is_grad_enabled()) {
-            m_rhs->update_grad(m_grad);
+            m_rhs->zero_and_update_grad(m_grad);
         }
     }
 
@@ -21,11 +21,11 @@ namespace nx::graph {
         // dx += dz
         // dy -= dz
         if (m_lhs->is_grad_enabled()) {
-            m_lhs->update_grad(m_grad);
+            m_lhs->zero_and_update_grad(m_grad);
         }
 
         if (m_rhs->is_grad_enabled()) {
-            m_rhs->update_grad(m_grad, false);
+            m_rhs->zero_and_update_grad(m_grad, false);
         }
     }
 
@@ -35,11 +35,11 @@ namespace nx::graph {
         // dy += dz * x
         // Use detach to prevent circular dependencies
         if (m_lhs->is_grad_enabled()) {
-            m_lhs->update_grad(mul(m_grad, graph::detach(m_rhs)));
+            m_lhs->zero_and_update_grad(mul(m_grad, graph::detach(m_rhs)));
         }
 
         if (m_rhs->is_grad_enabled()) {
-            m_rhs->update_grad(mul(m_grad, graph::detach(m_lhs)));
+            m_rhs->zero_and_update_grad(mul(m_grad, graph::detach(m_lhs)));
         }
     }
 
@@ -52,11 +52,11 @@ namespace nx::graph {
         OpPtr d_rhs = graph::detach(m_rhs);
 
         if (m_lhs->is_grad_enabled()) {
-            m_lhs->update_grad(div(m_grad, d_rhs));
+            m_lhs->zero_and_update_grad(div(m_grad, d_rhs));
         }
 
         if (m_rhs->is_grad_enabled()) {
-            m_rhs->update_grad(mul(m_grad, div(detach(), d_rhs)), false);
+            m_rhs->zero_and_update_grad(mul(m_grad, div(detach(), d_rhs)), false);
         }
     }
 
@@ -68,11 +68,11 @@ namespace nx::graph {
         usize ndim = m_lhs->descriptor().ndim();
 
         if (m_lhs->is_grad_enabled()) {
-            m_lhs->update_grad(gemm(m_grad, transpose(graph::detach(m_rhs), ndim - 2, ndim - 1)));
+            m_lhs->zero_and_update_grad(gemm(m_grad, transpose(graph::detach(m_rhs), ndim - 2, ndim - 1)));
         }
 
         if (m_rhs->is_grad_enabled()) {
-            m_rhs->update_grad(gemm(transpose(graph::detach(m_lhs), ndim - 2, ndim - 1), m_grad));
+            m_rhs->zero_and_update_grad(gemm(transpose(graph::detach(m_lhs), ndim - 2, ndim - 1), m_grad));
         }
     }
 
@@ -84,12 +84,12 @@ namespace nx::graph {
 
         if (m_lhs->is_grad_enabled()) {
             OpPtr l_minimum = astype(eq(graph::detach(m_lhs), d_out), d_out->descriptor().dtype());
-            m_lhs->update_grad(mul(m_grad, l_minimum));
+            m_lhs->zero_and_update_grad(mul(m_grad, l_minimum));
         }
 
         if (m_rhs->is_grad_enabled()) {
             OpPtr r_minimum = astype(eq(graph::detach(m_rhs), d_out), d_out->descriptor().dtype());
-            m_rhs->update_grad(mul(m_grad, r_minimum));
+            m_rhs->zero_and_update_grad(mul(m_grad, r_minimum));
         }
     }
 
@@ -101,12 +101,12 @@ namespace nx::graph {
 
         if (m_lhs->is_grad_enabled()) {
             OpPtr l_maximum = astype(eq(graph::detach(m_lhs), d_out), d_out->descriptor().dtype());
-            m_lhs->update_grad(mul(m_grad, l_maximum));
+            m_lhs->zero_and_update_grad(mul(m_grad, l_maximum));
         }
 
         if (m_rhs->is_grad_enabled()) {
             OpPtr r_maximum = astype(eq(graph::detach(m_rhs), d_out), d_out->descriptor().dtype());
-            m_rhs->update_grad(mul(m_grad, r_maximum));
+            m_rhs->zero_and_update_grad(mul(m_grad, r_maximum));
         }
     }
 } // namespace nx::graph

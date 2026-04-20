@@ -6,7 +6,7 @@ namespace nx::graph {
         // z = x**2
         // dx += dz * (2*x)
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(mul(m_grad, mul(graph::detach(m_operand), 2.0f)));
+            m_operand->zero_and_update_grad(mul(m_grad, mul(graph::detach(m_operand), 2.0f)));
         }
     }
 
@@ -15,7 +15,7 @@ namespace nx::graph {
         // dx += dz / (2*sqrt(x))
         // dx += dz / (2*z)
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(div(m_grad, mul(detach(), 2.0f)));
+            m_operand->zero_and_update_grad(div(m_grad, mul(detach(), 2.0f)));
         }
     }
 
@@ -24,7 +24,7 @@ namespace nx::graph {
         // dx += dz * -1
         // dx -= dz
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(m_grad, false);
+            m_operand->zero_and_update_grad(m_grad, false);
         }
     }
 
@@ -32,7 +32,7 @@ namespace nx::graph {
         // z = x
         // dx += dz
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(m_grad);
+            m_operand->zero_and_update_grad(m_grad);
         }
     }
 
@@ -41,7 +41,7 @@ namespace nx::graph {
         // dx += dz * exp(x)
         // dx += dz * z
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(mul(m_grad, detach()));
+            m_operand->zero_and_update_grad(mul(m_grad, detach()));
         }
     }
 
@@ -49,7 +49,7 @@ namespace nx::graph {
         // z = log(x)
         // dx += dz / x
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(div(m_grad, graph::detach(m_operand)));
+            m_operand->zero_and_update_grad(div(m_grad, graph::detach(m_operand)));
         }
     }
 
@@ -59,7 +59,7 @@ namespace nx::graph {
         // dx += dz * -z**2
         // dx -= dz * z**2
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(mul(m_grad, sq(detach())), false);
+            m_operand->zero_and_update_grad(mul(m_grad, sq(detach())), false);
         }
     }
 
@@ -67,7 +67,7 @@ namespace nx::graph {
         // z = sin(x)
         // dx += dz * cos(x)
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(mul(m_grad, cos(graph::detach(m_operand))));
+            m_operand->zero_and_update_grad(mul(m_grad, cos(graph::detach(m_operand))));
         }
     }
 
@@ -75,7 +75,7 @@ namespace nx::graph {
         // z = cos(x)
         // dx -= dz * sin(x)
         if (m_operand->is_grad_enabled()) {
-            m_operand->update_grad(mul(m_grad, sin(graph::detach(m_operand))), false);
+            m_operand->zero_and_update_grad(mul(m_grad, sin(graph::detach(m_operand))), false);
         }
     }
 } // namespace nx::graph

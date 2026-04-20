@@ -1,4 +1,4 @@
-#include "array.h"
+#include "functional.h"
 #include "module.h"
 #include "optim.h"
 
@@ -154,8 +154,8 @@ NB_MODULE(nx, m) {
     m_nn.def("linear", &nxn::linear, "x"_a, "weight"_a, "Functional linear without bias");
     m_nn.def("linear_with_bias", &nxn::linear_with_bias, "x"_a, "weight"_a, "bias"_a, "Functional linear with bias");
     m_nn.def("relu", &nxn::relu, "x"_a, "ReLU activation function");
-    m_nn.def("onehot", &nxn::onehot, "x"_a, "num_classes"_a = -1, "One-hot encode input array");
-    m_nn.def("softmax", &nxn::softmax, "x"_a, "dim"_a = -1, "Compute softmax for input array");
+    m_nn.def("onehot", &nxb::onehot, "x"_a, "num_classes"_a = -1, "One-hot encode input array");
+    m_nn.def("softmax", &nxb::softmax, "x"_a, "dim"_a = -1, "Compute softmax for input array");
     m_nn.def("cross_entropy_loss", &nxn::cross_entropy_loss, "x"_a, "y"_a, "Compute cross-entropy loss between input x and target y");
 
     nb::class_<nxn::Module, nxb::PyModule>(m_nn, "Module")

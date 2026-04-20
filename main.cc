@@ -4,18 +4,21 @@
 using namespace nx::core;
 using namespace nx::optim;
 using namespace nx::nn;
+using namespace nx::foundation;
 
 void run_basic();
 void run_advanced();
 void run_random();
 void run_backprop_v1();
 void run_backprop_v2();
+void run_backprop_v3();
+void run_onehot();
 void run_linear();
 void run_multipass_with_vanilla_gd();
 void run_multipass_with_sgd();
 
 int main() {
-    run_multipass_with_sgd();
+    run_onehot();
     return 0;
 }
 
@@ -65,6 +68,22 @@ void run_backprop_v2() {
     std::println("{}\n", x2.grad().value());
     std::println("{}\n", x3.grad().value());
     std::println("{}\n", x4.grad().value());
+}
+
+void run_backprop_v3() {
+    auto x1 = arange({4, 6, 8}, 2, 2, &f32, DeviceKind::MPS, 0, true);
+    auto x2 = x1.slice({Range(1, 3, 1), Range(0, 6, 2), Range(0, 8, 1)});
+    auto x3 = x2.sum();
+    x3.backward();
+    std::println("{}\n", x3.grad().value());
+    std::println("{}\n", x2.grad().value());
+    std::println("{}\n", x1.grad().value());
+}
+
+void run_onehot() {
+    auto x1 = arange({64}, 1, 1, &i32, DeviceKind::MPS, 0, true);
+    auto x2 = onehot(x1, x1.max().item() + 1);
+    std::println("{}\n", x2);
 }
 
 void run_linear() {

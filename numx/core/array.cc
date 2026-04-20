@@ -17,9 +17,11 @@ namespace nx::core {
             for (auto iter = m_graph->fw_begin(); iter != m_graph->fw_end(); ++iter) {
                 Op *op = *iter;
 
-                if (!op->is_param()) {
-                    ArrayDescriptor &descriptor = op->descriptor();
-                    descriptor.invalidate_buffer();
+                if (!op->is_param() && op->descriptor().is_buffer_valid()) {
+                    if (!op->descriptor().buffer().is_view()) {
+                        ArrayDescriptor &descriptor = op->descriptor();
+                        descriptor.invalidate_buffer();
+                    }
                 }
             }
 

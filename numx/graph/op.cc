@@ -25,13 +25,16 @@ namespace nx::graph {
     void Op::slice_grad(OpPtr grad, const RangeVec &ranges) { m_partial_grad = slice(grad, ranges); }
 
     void Op::update_grad(OpPtr grad, bool add) {
-        zero_grad();
-
         if (add) {
             m_partial_grad = i_add(m_partial_grad, grad);
         } else {
             m_partial_grad = i_sub(m_partial_grad, grad);
         }
+    }
+
+    void Op::zero_and_update_grad(OpPtr grad, bool add) {
+        zero_grad();
+        update_grad(grad, add);
     }
 
     void Op::enable_grad(bool enabled) {

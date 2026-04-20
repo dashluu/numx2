@@ -1,5 +1,6 @@
 import numpy as np
 from nx.core import from_numpy
+from utils import np_assert_array, np_assert_scalar
 
 
 class TestGemm:
@@ -24,7 +25,7 @@ class TestGemm:
             nx2 = from_numpy(np2)
             nx3 = nx1 @ nx2
             np3 = np1 @ np2
-            assert np.allclose(nx3.item(), np3, atol=1e-3, rtol=0)
+            np_assert_scalar(nx3, np3)
 
     def test_gemm2d(self):
         """Test matrix multiplication for 2D arrays"""
@@ -54,8 +55,7 @@ class TestGemm:
             nx2 = from_numpy(np2)
             nx3 = nx1 @ nx2
             np3 = np1 @ np2
-            assert tuple(nx3.view) == np3.shape
-            assert np.allclose(nx3.numpy(), np3, atol=1e-3, rtol=0)
+            np_assert_array(nx3, np3)
 
     def test_gemm3d(self):
         """Test matrix multiplication for 3D arrays (batched gemm)"""
@@ -90,8 +90,7 @@ class TestGemm:
             nx2 = from_numpy(np2)
             nx3 = nx1 @ nx2
             np3 = np1 @ np2
-            assert tuple(nx3.view) == np3.shape
-            assert np.allclose(nx3.numpy(), np3, atol=1e-3, rtol=0)
+            np_assert_array(nx3, np3)
 
     def test_multidim_gemm(self):
         """Test multi-dimensional matrix multiplication"""
@@ -113,5 +112,4 @@ class TestGemm:
             nx2 = from_numpy(np2)
             nx3 = nx1 @ nx2
             np3 = np1 @ np2
-            assert tuple(nx3.view) == np3.shape
-            assert np.allclose(nx3.numpy(), np3, atol=1e-3, rtol=0)
+            np_assert_array(nx3, np3)

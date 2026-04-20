@@ -11,10 +11,6 @@ namespace nx::nn {
             throw std::invalid_argument("array is not of type integral.");
         }
 
-        if (num_classes <= 0) {
-            num_classes = x.max().item() + 1;
-        }
-
         Array classes = core::arange({num_classes}, 0, 1, &i32);
         return (x.unsqueeze() == classes).astype(&i32);
     }

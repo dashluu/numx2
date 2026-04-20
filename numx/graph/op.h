@@ -71,9 +71,6 @@ namespace nx::graph {
         OpPtr m_partial_grad = nullptr;
 
         OpPtr nonconst() const { return nonconst_primitive<Op>(shared_from_this()); }
-        void zero_grad();
-        void one_grad();
-        void clear_grad();
 
     public:
         explicit Op(ArrayDescriptor descriptor) : Primitive(), m_descriptor(std::move(descriptor)) {
@@ -89,8 +86,12 @@ namespace nx::graph {
         OpPtr partial_grad() const { return m_partial_grad; }
         virtual bool is_graph_break() const = 0;
         OpPtr detach();
+        void clear_grad();
+        void zero_grad();
+        void one_grad();
         void slice_grad(OpPtr grad, const RangeVec &ranges);
         void update_grad(OpPtr grad, bool add = true);
+        void zero_and_update_grad(OpPtr grad, bool add = true);
         void enable_grad(bool enabled);
     };
 } // namespace nx::graph

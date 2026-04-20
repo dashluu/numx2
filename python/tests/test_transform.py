@@ -1,5 +1,6 @@
 import numpy as np
 from nx.core import from_numpy
+from utils import np_assert_array
 
 
 class TestTransform:
@@ -10,7 +11,7 @@ class TestTransform:
         nx1 = from_numpy(np1)
         nx2 = nx1[::, ::, ::]
         np2 = np1[::, ::, ::]
-        assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+        np_assert_array(nx2, np2)
 
     def test_slice_v2(self):
         print("slice 2:")
@@ -19,7 +20,7 @@ class TestTransform:
         nx1 = from_numpy(np1)
         nx2 = nx1[1::4, :3:2, 2::3]
         np2 = np1[1::4, :3:2, 2::3]
-        assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+        np_assert_array(nx2, np2)
 
     def test_slice_v3(self):
         print("slice 3:")
@@ -28,7 +29,7 @@ class TestTransform:
         nx1 = from_numpy(np1)
         nx2 = nx1[1::, ::2, 3:0:-2]
         np2 = np1[1::, ::2, 3:0:-2]
-        assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+        np_assert_array(nx2, np2)
 
     def test_slice_v4(self):
         print("slice 4:")
@@ -37,7 +38,7 @@ class TestTransform:
         nx1 = from_numpy(np1)
         nx2 = nx1[1:0:-4, 9:3:-2, 2::3]
         np2 = np1[1:0:-4, 9:3:-2, 2::3]
-        assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+        np_assert_array(nx2, np2)
 
     def test_transpose_start(self):
         print("transpose at the start:")
@@ -49,7 +50,7 @@ class TestTransform:
         # Reverse order from start_dim to end_dim
         order[0 : 2 + 1] = order[0 : 2 + 1][::-1]  # [2,1,0,3]
         np2 = np.transpose(np1, order)
-        assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+        np_assert_array(nx2, np2)
 
     def test_transpose_mid(self):
         print("transpose in the middle:")
@@ -61,7 +62,7 @@ class TestTransform:
         # Reverse order from start_dim to end_dim
         order[1:-1] = order[1:-1][::-1]  # [0,3,2,1]
         np2 = np.transpose(np1, order)
-        assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+        np_assert_array(nx2, np2)
 
     def test_transpose_end(self):
         print("transpose at the end:")
@@ -73,7 +74,7 @@ class TestTransform:
         # Reverse order from start_dim to end_dim
         order[-3:] = order[-3:][::-1]  # [0,3,2,1]
         np2 = np.transpose(np1, order)
-        assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+        np_assert_array(nx2, np2)
 
     def test_permute(self):
         print("Testing permute operations:")
@@ -98,7 +99,7 @@ class TestTransform:
             nx1 = from_numpy(np1)
             nx2 = nx1.permute(permutation)
             np2 = np.transpose(np1, permutation)
-            assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+            np_assert_array(nx2, np2)
 
     def test_flatten(self):
         print("Testing flatten operations:")
@@ -124,4 +125,4 @@ class TestTransform:
             nx1 = from_numpy(np1)
             nx2 = nx1.flatten(start, end)
             np2 = np1.reshape(expected)
-            assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+            np_assert_array(nx2, np2)

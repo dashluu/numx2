@@ -2,26 +2,11 @@ from __future__ import annotations
 
 import numpy as np
 from nx.core import Array, from_numpy
-
-
-def randn(shape) -> np.ndarray:
-    return np.random.randn(*shape).astype(np.float32)
-
-
-def nonzero_randn(shape) -> np.ndarray:
-    array = randn(shape)
-    # Replace zeros with small random values
-    zero_mask = array == 0
-    array[zero_mask] = np.random.uniform(0.1, 1.0, size=np.count_nonzero(zero_mask))
-    return array
-
-
-def positive_randn(shape) -> np.ndarray:
-    return np.abs(nonzero_randn(shape))
+from utils import nonzero_randn, np_assert_array, positive_randn, randn
 
 
 class TestUnary:
-    def unary_no_broadcast(self, name: str, op1, op2, gen_fn=randn):
+    def unary_no_broadcast(self, name: str, op1, op2, rand_fn=randn):
         print(f"{name}:")
 
         test_cases = [
@@ -35,14 +20,13 @@ class TestUnary:
 
         for shape in test_cases:
             print(f"Testing shape: {shape}")
-            np1 = gen_fn(shape)
+            np1 = rand_fn(shape)
             nx1 = from_numpy(np1)
             nx2: Array = op1(nx1)
             np2: np.ndarray = op2(np1)
-            assert tuple(nx2.view) == np2.shape
-            assert np.allclose(nx2.numpy(), np2, atol=1e-3, rtol=0)
+            np_assert_array(nx2, np2)
 
-    def unary_with_slicing(self, name: str, op1, op2, gen_fn=randn):
+    def unary_with_slicing(self, name: str, op1, op2, rand_fn=randn):
         print(f"{name} with slicing:")
 
         # Test cases with different slicing patterns
@@ -56,7 +40,7 @@ class TestUnary:
 
         for shape, slices in test_cases:
             print(f"Testing shape: {shape}, slices: {slices}")
-            np1 = gen_fn(shape)
+            np1 = rand_fn(shape)
             nx1 = from_numpy(np1)
             # Create non-contiguous array using slicing
             nx2 = nx1[slices]
@@ -64,11 +48,9 @@ class TestUnary:
             # Compare with NumPy
             np2 = np1[slices]  # Apply same slicing
             np3: np.ndarray = op2(np2)  # Apply same operation
-            np4 = nx3.numpy().reshape(np3.shape)
-            assert np.allclose(np4, np3, atol=1e-3, rtol=0)
-            assert tuple(nx3.view) == np3.shape
+            np_assert_array(nx3, np3)
 
-    def unary_inplace(self, name: str, op1, op2, gen_fn=randn):
+    def unary_inplace(self, name: str, op1, op2, rand_fn=randn):
         print(f"{name} inplace:")
 
         # Test different shapes
@@ -83,16 +65,14 @@ class TestUnary:
         for shape in test_cases:
             print(f"Testing shape: {shape}")
             # Generate input
-            np1: np.ndarray = gen_fn(shape)
-            np2 = np1.copy()
+            np1 = rand_fn(shape)
             # Create array
             nx1 = from_numpy(np1)
             # Apply inplace operation
             nx2: Array = op1(nx1)
             # Compare with NumPy
-            np3 = op2(np2)
-            nx3 = nx2.numpy().reshape(shape)
-            assert np.allclose(nx3, np3, atol=1e-3, rtol=0)
+            np2 = op2(np1.copy())
+            np_assert_array(nx2, np2)
 
     def test_exp(self):
         self.unary_no_broadcast("exp", Array.exp, np.exp)
@@ -101,11 +81,11 @@ class TestUnary:
         self.unary_no_broadcast("neg", Array.neg, np.negative)
 
     def test_log(self):
-        self.unary_no_broadcast("log", Array.log, np.log, gen_fn=positive_randn)
+        self.unary_no_broadcast("log", Array.log, np.log, rand_fn=positive_randn)
 
     def test_recip(self):
         self.unary_no_broadcast(
-            "recip", Array.recip, np.reciprocal, gen_fn=nonzero_randn
+            "recip", Array.recip, np.reciprocal, rand_fn=nonzero_randn
         )
 
     def test_exp_with_slicing(self):
@@ -115,7 +95,7 @@ class TestUnary:
         self.unary_with_slicing("neg", Array.neg, np.negative)
 
     def test_log_with_slicing(self):
-        self.unary_with_slicing("log", Array.log, np.log, gen_fn=positive_randn)
+        self.unary_with_slicing("log", Array.log, np.log, rand_fn=positive_randn)
 
     def test_exp_inplace(self):
         def exp_inplace(x: Array):
@@ -127,7 +107,7 @@ class TestUnary:
         def sqrt_inplace(x: Array):
             return x.sqrt(in_place=True)
 
-        self.unary_inplace("sqrt", sqrt_inplace, np.sqrt, gen_fn=positive_randn)
+        self.unary_inplace("sqrt", sqrt_inplace, np.sqrt, rand_fn=positive_randn)
 
     def test_neg_inplace(self):
         def neg_inplace(x: Array):
@@ -139,10 +119,10 @@ class TestUnary:
         def recip_inplace(x: Array):
             return x.recip(in_place=True)
 
-        self.unary_inplace("recip", recip_inplace, np.reciprocal, gen_fn=nonzero_randn)
+        self.unary_inplace("recip", recip_inplace, np.reciprocal, rand_fn=nonzero_randn)
 
     def test_log_inplace(self):
         def log_inplace(x: Array):
             return x.log(in_place=True)
 
-        self.unary_inplace("log", log_inplace, np.log, gen_fn=positive_randn)
+        self.unary_inplace("log", log_inplace, np.log, rand_fn=positive_randn)
