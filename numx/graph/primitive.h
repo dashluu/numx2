@@ -6,12 +6,12 @@ namespace nx::graph {
     using foundation::ArrayDescriptor;
 
     enum struct PrimitiveKind {
-        Initializer,
-        Unary,
-        Binary,
-        Transform,
-        Reduce,
-        Fuse
+        InitializerOp,
+        UnaryOp,
+        BinaryOp,
+        TransformOp,
+        ReduceOp,
+        FusedKernel
     };
 
     struct Primitive : public std::enable_shared_from_this<Primitive> {

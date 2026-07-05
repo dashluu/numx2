@@ -16,7 +16,7 @@ namespace nx::graph {
             m_grad_enabled = m_grad_enabled || operand->is_grad_enabled() || operand->is_param();
         }
 
-        PrimitiveKind kind() const override { return PrimitiveKind::Transform; }
+        PrimitiveKind kind() const override { return PrimitiveKind::TransformOp; }
         std::string_view kind_str() const override { return "transform"; }
         bool is_graph_break() const override { return true; }
         OpPtr operand() const { return m_operand; }

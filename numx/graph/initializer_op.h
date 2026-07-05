@@ -9,7 +9,7 @@ namespace nx::graph {
     struct InitializerOp : public Op {
     public:
         explicit InitializerOp(ArrayDescriptor descriptor) : Op(std::move(descriptor)) {}
-        PrimitiveKind kind() const override { return PrimitiveKind::Initializer; }
+        PrimitiveKind kind() const override { return PrimitiveKind::InitializerOp; }
         std::string_view kind_str() const override { return "initializer"; }
         bool is_graph_break() const override { return true; }
     };

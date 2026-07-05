@@ -13,7 +13,7 @@ namespace nx::graph {
             m_grad_enabled = m_grad_enabled || operand->is_grad_enabled() || operand->is_param();
         }
 
-        PrimitiveKind kind() const override { return PrimitiveKind::Unary; }
+        PrimitiveKind kind() const override { return PrimitiveKind::UnaryOp; }
         std::string_view kind_str() const override { return "unary"; }
         bool is_graph_break() const override { return false; }
         OpPtr operand() const { return m_operand; }

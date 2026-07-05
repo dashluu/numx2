@@ -21,7 +21,7 @@ namespace nx::graph {
             m_grad_enabled = m_grad_enabled || lhs->is_grad_enabled() || rhs->is_grad_enabled() || lhs->is_param() || rhs->is_param();
         }
 
-        PrimitiveKind kind() const override { return PrimitiveKind::Binary; }
+        PrimitiveKind kind() const override { return PrimitiveKind::BinaryOp; }
         std::string_view kind_str() const override { return "binary"; }
         BinaryType type() const { return m_type; }
         bool is_graph_break() const override { return false; }

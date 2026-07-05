@@ -11,18 +11,18 @@ namespace nx::graph {
         m_marked.insert(ptr);
 
         switch (op->kind()) {
-        case PrimitiveKind::Initializer: {
+        case PrimitiveKind::InitializerOp: {
             m_fw_tape.push_back(op);
             break;
         }
-        case PrimitiveKind::Unary: {
+        case PrimitiveKind::UnaryOp: {
             auto unary_op = static_cast<UnaryOp *>(op);
             Op *operand = unary_op->operand_raw();
             recur_fw_sort(operand);
             m_fw_tape.push_back(op);
             break;
         }
-        case PrimitiveKind::Binary: {
+        case PrimitiveKind::BinaryOp: {
             auto binary_op = static_cast<BinaryOp *>(op);
             Op *lhs = binary_op->lhs_raw();
             Op *rhs = binary_op->rhs_raw();
@@ -31,7 +31,7 @@ namespace nx::graph {
             m_fw_tape.push_back(op);
             break;
         }
-        case PrimitiveKind::Transform: {
+        case PrimitiveKind::TransformOp: {
             auto transform_op = static_cast<TransformOp *>(op);
             Op *operand = transform_op->operand_raw();
             recur_fw_sort(operand);
@@ -58,18 +58,18 @@ namespace nx::graph {
         m_marked.insert(ptr);
 
         switch (op->kind()) {
-        case PrimitiveKind::Initializer: {
+        case PrimitiveKind::InitializerOp: {
             m_bw_tape.push_back(op);
             break;
         }
-        case PrimitiveKind::Unary: {
+        case PrimitiveKind::UnaryOp: {
             auto unary_op = static_cast<UnaryOp *>(op);
             Op *operand = unary_op->operand_raw();
             recur_bw_sort(operand);
             m_bw_tape.push_back(op);
             break;
         }
-        case PrimitiveKind::Binary: {
+        case PrimitiveKind::BinaryOp: {
             auto binary_op = static_cast<BinaryOp *>(op);
             Op *lhs = binary_op->lhs_raw();
             Op *rhs = binary_op->rhs_raw();
@@ -78,7 +78,7 @@ namespace nx::graph {
             m_bw_tape.push_back(op);
             break;
         }
-        case PrimitiveKind::Transform: {
+        case PrimitiveKind::TransformOp: {
             auto transform_op = static_cast<TransformOp *>(op);
             Op *operand = transform_op->operand_raw();
             recur_bw_sort(operand);

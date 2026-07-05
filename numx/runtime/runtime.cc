@@ -3,19 +3,19 @@
 namespace nx::runtime {
     void Runtime::run_op(Op *op) {
         switch (op->kind()) {
-        case PrimitiveKind::Initializer: {
+        case PrimitiveKind::InitializerOp: {
             run_initializer_op(op);
             break;
         }
-        case PrimitiveKind::Unary: {
+        case PrimitiveKind::UnaryOp: {
             run_unary_op(op);
             break;
         }
-        case PrimitiveKind::Binary: {
+        case PrimitiveKind::BinaryOp: {
             run_binary_op(op);
             break;
         }
-        case PrimitiveKind::Transform: {
+        case PrimitiveKind::TransformOp: {
             run_transform_op(op);
             break;
         }
