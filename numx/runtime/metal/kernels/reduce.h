@@ -1,3 +1,5 @@
+#pragma once
+
 #include "utils.h"
 
 template <class T>
@@ -70,14 +72,11 @@ struct AtomicMaxFloat {
     void operator()(volatile device metal::_atomic<R> *output, T new_val) {
         // CAS algorithm
         // output = max(output, val)
-        R old_val = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        R old_val;
+
         do {
-            if (old_val >= new_val) {
-                break;
-            }
-            // old_val gets updated by metal::atomic_compare_exchange_weak_explicit if the operation fails
-            // No need for old_val to be in the while loop
-        } while (!metal::atomic_compare_exchange_weak_explicit(output, &old_val, new_val, metal::memory_order_relaxed, metal::memory_order_relaxed));
+            old_val = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        } while (old_val < new_val && !metal::atomic_compare_exchange_weak_explicit(output, &old_val, new_val, metal::memory_order_relaxed, metal::memory_order_relaxed));
     }
 };
 
@@ -93,14 +92,11 @@ struct AtomicMinFloat {
     void operator()(volatile device metal::_atomic<R> *output, T new_val) {
         // CAS algorithm
         // output = min(output, val)
-        R old_val = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        R old_val;
+
         do {
-            if (old_val <= new_val) {
-                break;
-            }
-            // old_val gets updated by metal::atomic_compare_exchange_weak_explicit if the operation fails
-            // No need for old_val to be in the while loop
-        } while (!metal::atomic_compare_exchange_weak_explicit(output, &old_val, new_val, metal::memory_order_relaxed, metal::memory_order_relaxed));
+            old_val = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        } while (old_val > new_val && !metal::atomic_compare_exchange_weak_explicit(output, &old_val, new_val, metal::memory_order_relaxed, metal::memory_order_relaxed));
     }
 };
 
@@ -137,59 +133,51 @@ struct Argmin {
 struct AtomicArgmax {
     template <class T>
     void operator()(const device T *input, volatile device metal::_atomic<uint> *output, thread IndexValPair<T> &new_pair) {
-        uint old_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        uint old_idx;
         T old_val;
 
         do {
+            old_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
             old_val = input[old_idx];
-            if (old_val >= new_pair.val) {
-                break;
-            }
-        } while (!metal::atomic_compare_exchange_weak_explicit(output, &old_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
+        } while (old_val < new_pair.val && !metal::atomic_compare_exchange_weak_explicit(output, &old_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
     }
 
     template <class T>
     void operator()(const device T *input, usize row_idx, usize ndim, const constant usize *shape, const constant isize *stride, volatile device metal::_atomic<uint> *output, thread IndexValPair<T> &new_pair) {
-        uint col_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        uint col_idx;
         usize old_loc;
         T old_val;
 
         do {
+            col_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
             old_loc = item_loc(row_idx + col_idx, ndim, shape, stride);
             old_val = input[old_loc];
-            if (old_val >= new_pair.val) {
-                break;
-            }
-        } while (!metal::atomic_compare_exchange_weak_explicit(output, &col_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
+        } while (old_val < new_pair.val && !metal::atomic_compare_exchange_weak_explicit(output, &col_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
     }
 };
 
 struct AtomicArgmin {
     template <class T>
     void operator()(const device T *input, volatile device metal::_atomic<uint> *output, thread IndexValPair<T> &new_pair) {
-        uint old_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        uint old_idx;
         T old_val;
 
         do {
+            old_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
             old_val = input[old_idx];
-            if (old_val <= new_pair.val) {
-                break;
-            }
-        } while (!metal::atomic_compare_exchange_weak_explicit(output, &old_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
+        } while (old_val > new_pair.val && !metal::atomic_compare_exchange_weak_explicit(output, &old_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
     }
 
     template <class T>
     void operator()(const device T *input, usize row_idx, usize ndim, const constant usize *shape, const constant isize *stride, volatile device metal::_atomic<uint> *output, thread IndexValPair<T> &new_pair) {
-        uint col_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
+        uint col_idx;
         usize old_loc;
         T old_val;
 
         do {
+            col_idx = metal::atomic_load_explicit(output, metal::memory_order_relaxed);
             old_loc = item_loc(row_idx + col_idx, ndim, shape, stride);
             old_val = input[old_loc];
-            if (old_val <= new_pair.val) {
-                break;
-            }
-        } while (!metal::atomic_compare_exchange_weak_explicit(output, &col_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
+        } while (old_val > new_pair.val && !metal::atomic_compare_exchange_weak_explicit(output, &col_idx, new_pair.idx, metal::memory_order_relaxed, metal::memory_order_relaxed));
     }
 };

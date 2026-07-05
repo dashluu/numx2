@@ -10,7 +10,8 @@ namespace nx::graph {
         Unary,
         Binary,
         Transform,
-        Reduce
+        Reduce,
+        Fuse
     };
 
     struct Primitive : public std::enable_shared_from_this<Primitive> {
