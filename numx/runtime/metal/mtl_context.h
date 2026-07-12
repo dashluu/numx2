@@ -4,7 +4,6 @@
 #include "../../graph/functional.h"
 #include "../runtime_context.h"
 #include "mtl_kernel.h"
-#include <memory>
 
 namespace nx::runtime::metal {
     using foundation::DTypeKind;
@@ -14,7 +13,9 @@ namespace nx::runtime::metal {
     private:
         NS::SharedPtr<MTL::Device> m_mtl_device;
         NS::SharedPtr<MTL::Library> m_lib;
-        NS::SharedPtr<MTL::CommandQueue> m_cmd_queue;
+        NS::SharedPtr<MTL4::CommandQueue> m_cmd_queue;
+        NS::SharedPtr<MTL4::CommandBuffer> m_cmd_buff;
+        NS::SharedPtr<MTL4::CommandAllocator> m_cmd_allocator;
         std::unordered_map<std::string, MTLKernelPtr> m_kernel_by_name;
 
         void init_kernel(const std::string &name);
@@ -34,7 +35,9 @@ namespace nx::runtime::metal {
         void init_kernels();
         bool register_kernel(const std::string &name, MTLKernelPtr kernel);
         NS::SharedPtr<MTL::Device> mtl_device() const { return m_mtl_device; }
-        NS::SharedPtr<MTL::CommandQueue> cmd_queue() const { return m_cmd_queue; }
+        NS::SharedPtr<MTL4::CommandQueue> cmd_queue() const { return m_cmd_queue; }
+        NS::SharedPtr<MTL4::CommandBuffer> cmd_buff() const { return m_cmd_buff; }
+        NS::SharedPtr<MTL4::CommandAllocator> cmd_allocator() const { return m_cmd_allocator; }
         MTLKernel *kernel(const std::string &name) const { return m_kernel_by_name.contains(name) ? m_kernel_by_name.at(name).get() : nullptr; }
     };
 

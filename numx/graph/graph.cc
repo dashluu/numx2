@@ -2,7 +2,7 @@
 
 namespace nx::graph {
     void Graph::recur_fw_sort(Op *op) {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(op);
+        std::uintptr_t ptr = reinterpret_cast<std::uintptr_t>(op);
 
         if (m_marked.contains(ptr)) {
             return;
@@ -49,7 +49,7 @@ namespace nx::graph {
     }
 
     void Graph::recur_bw_sort(Op *op) {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(op);
+        std::uintptr_t ptr = reinterpret_cast<std::uintptr_t>(op);
 
         if (m_marked.contains(ptr)) {
             return;

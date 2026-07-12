@@ -2,8 +2,7 @@
 
 namespace nx::runtime::metal {
     void MTLContext::init_kernel(const std::string &name) {
-        MTLKernelPtr kernel = make_mtl_kernel(name);
-        kernel->init(m_mtl_device, m_lib);
+        MTLKernelPtr kernel = make_mtl_kernel(name, m_mtl_device, m_lib);
         m_kernel_by_name[name] = std::move(kernel);
     }
 
@@ -154,7 +153,9 @@ namespace nx::runtime::metal {
             throw std::runtime_error(description);
         }
 
-        m_cmd_queue = NS::TransferPtr<MTL::CommandQueue>(m_mtl_device->newCommandQueue());
+        m_cmd_queue = NS::TransferPtr<MTL4::CommandQueue>(m_mtl_device->newMTL4CommandQueue());
+        m_cmd_buff = NS::TransferPtr<MTL4::CommandBuffer>(m_mtl_device->newCommandBuffer());
+        m_cmd_allocator = NS::TransferPtr<MTL4::CommandAllocator>(m_mtl_device->newCommandAllocator());
     }
 
     void MTLContext::init_kernels() {

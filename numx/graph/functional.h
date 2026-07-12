@@ -27,7 +27,7 @@ namespace nx::graph {
     usize item(OpPtr op);
 
     // Creates a node from raw buffer data
-    inline OpPtr from_buffer(uint8_t *ptr, usize nbytes, const Shape &shape, const DType *dtype, const Device *device, bool is_param) {
+    inline OpPtr from_buffer(std::uint8_t *ptr, usize nbytes, const Shape &shape, const DType *dtype, const Device *device, bool is_param) {
         return make_primitive<Nop>(ArrayDescriptor(ptr, nbytes, shape, dtype, device, is_param));
     }
 
@@ -74,7 +74,7 @@ namespace nx::graph {
 
     template <NumericType T>
     OpPtr uniform(const ShapeView &view, RandomKeyGenerator *key_gen, T low, T high, const DType *dtype, const Device *device, bool is_param = false) {
-        uint64_t key = key_gen->next();
+        std::uint64_t key = key_gen->next();
         return make_primitive<UniformOp>(ArrayDescriptor(Shape(view), dtype, device, is_param), key, numeric_bitcast(dtype, low), numeric_bitcast(dtype, high));
     }
 

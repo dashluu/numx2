@@ -78,7 +78,7 @@ namespace nx::core {
         return randint<int>(view, 0, 2, &i32, device_kind, device_id, is_param).astype(&b8);
     }
 
-    Array from_buffer(uint8_t *ptr, usize nbytes, const Shape &shape, const DType *dtype = &f32, DeviceKind device_kind = default_device_kind, usize device_id = default_device_id, bool is_param = false);
+    Array from_buffer(std::uint8_t *ptr, usize nbytes, const Shape &shape, const DType *dtype = &f32, DeviceKind device_kind = default_device_kind, usize device_id = default_device_id, bool is_param = false);
     Array arange(const ShapeView &view, isize start, isize step, const DType *dtype = &f32, DeviceKind device_kind = default_device_kind, usize device_id = default_device_id, bool is_param = false);
     Array kaiming_uniform(const ShapeView &view, const DType *dtype = &f32, DeviceKind device_kind = default_device_kind, usize device_id = default_device_id, bool is_param = false);
     Array zeros(const ShapeView &view, const DType *dtype = &f32, DeviceKind device_kind = default_device_kind, usize device_id = default_device_id, bool is_param = false);

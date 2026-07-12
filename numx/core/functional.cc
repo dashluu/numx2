@@ -1,7 +1,7 @@
 #include "functional.h"
 
 namespace nx::core {
-    Array from_buffer(uint8_t *ptr, usize nbytes, const Shape &shape, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
+    Array from_buffer(std::uint8_t *ptr, usize nbytes, const Shape &shape, const DType *dtype, DeviceKind device_kind, usize device_id, bool is_param) {
         Runtime *runtime = backend_runtime(device_id, device_kind);
         const Device *device = runtime->context()->device();
         return Array(graph::from_buffer(ptr, nbytes, shape, dtype, device, is_param), runtime);

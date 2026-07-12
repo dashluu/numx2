@@ -3,7 +3,11 @@
 namespace nx::runtime::metal {
     void MTLRuntime::run_contiguous_unary_kernel(Op *in_op, Op *out_op) {
         NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
-        MTLEncoder encoder(m_ctx.get());
+        NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
+        NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
+        arg_table_desc->setMaxBufferBindCount(3);
+        residency_set_desc->setInitialCapacity(3);
+        MTLEncoder encoder(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &in_descriptor = in_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
         mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
@@ -11,16 +15,20 @@ namespace nx::runtime::metal {
         encoder.encode_array_buffer(in_descriptor);
         encoder.encode_array_buffer(out_descriptor);
         std::string kernel_name = std::format("{}_{}", out_op->opname(), in_descriptor.dtype()->str());
-        encoder.set_pipeline_state(kernel_name);
+        encoder.use_kernel(kernel_name);
         usize numel = in_descriptor.numel();
         encoder.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
-        encoder.wait_to_complete();
+        encoder.commit();
         pool->release();
     }
 
     void MTLRuntime::run_strided_unary_kernel(Op *in_op, Op *out_op) {
         NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
-        MTLEncoder encoder(m_ctx.get());
+        NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
+        NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
+        arg_table_desc->setMaxBufferBindCount(8);
+        residency_set_desc->setInitialCapacity(8);
+        MTLEncoder encoder(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &in_descriptor = in_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
         mtl_usize ndim = in_descriptor.ndim();
@@ -35,10 +43,10 @@ namespace nx::runtime::metal {
         encoder.encode_array_buffer(in_descriptor);
         encoder.encode_array_buffer(out_descriptor);
         std::string kernel_name = std::format("strided_{}_{}", out_op->opname(), in_descriptor.dtype()->str());
-        encoder.set_pipeline_state(kernel_name);
+        encoder.use_kernel(kernel_name);
         usize numel = in_descriptor.numel();
         encoder.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
-        encoder.wait_to_complete();
+        encoder.commit();
         pool->release();
     }
 

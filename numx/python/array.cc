@@ -142,7 +142,7 @@ namespace nx::bind {
         }
 
         Shape shape(0, view, stride);
-        uint8_t *ptr = reinterpret_cast<uint8_t *>(ndarr.data());
+        std::uint8_t *ptr = reinterpret_cast<std::uint8_t *>(ndarr.data());
         const DType *dtype = dtype_from_nb_dtype(ndarr.dtype());
         return nxc::from_buffer(ptr, ndarr.nbytes(), shape, dtype, default_device_kind, default_device_id, is_param);
     }

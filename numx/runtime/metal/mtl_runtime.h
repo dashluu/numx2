@@ -26,10 +26,10 @@ namespace nx::runtime::metal {
         void run_binary_kernel(Op *l_op, Op *r_op, Op *out_op) override;
         void run_contiguous_binary_kernel(Op *l_op, Op *r_op, Op *out_op);
         void run_strided_binary_kernel(Op *l_op, Op *r_op, Op *out_op);
-        void run_gevv_kernel(MTLEncoder &encoder, Op *l_op, Op *r_op, Op *out_op);
-        void run_simd_gevv_kernel(MTLEncoder &encoder, Op *l_op, Op *r_op, Op *out_op);
-        void run_gemm2d_kernel(MTLEncoder &encoder, Op *l_op, Op *r_op, Op *out_op);
-        void run_gemm3d_kernel(MTLEncoder &encoder, Op *l_op, Op *r_op, Op *out_op);
+        void run_gevv_kernel(Op *l_op, Op *r_op, Op *out_op);
+        void run_simd_gevv_kernel(Op *l_op, Op *r_op, Op *out_op);
+        void run_gemm2d_kernel(Op *l_op, Op *r_op, Op *out_op);
+        void run_gemm3d_kernel(Op *l_op, Op *r_op, Op *out_op);
         void run_gemm_kernel(Op *l_op, Op *r_op, Op *out_op) override;
         void run_unary_kernel(Op *in_op, Op *out_op) override;
         void run_contiguous_unary_kernel(Op *in_op, Op *out_op);

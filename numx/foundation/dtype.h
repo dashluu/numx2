@@ -31,8 +31,8 @@ namespace nx::foundation {
         bool operator==(const DType &dtype) const { return m_kind == dtype.m_kind && m_size == dtype.m_size; }
         friend std::ostream &operator<<(std::ostream &os, const DType &dtype) { return os << dtype.str(); }
         std::string str() const;
-        virtual std::string value(uint8_t *ptr) const = 0;
-        virtual usize bit_cast(uint8_t *ptr) const = 0;
+        virtual std::string value(std::uint8_t *ptr) const = 0;
+        virtual usize bit_cast(std::uint8_t *ptr) const = 0;
         virtual usize max() const = 0;
         virtual usize min() const = 0;
     };
@@ -42,7 +42,7 @@ namespace nx::foundation {
     public:
         FloatDtype(usize size) : DType(DTypeKind::Float, size) {}
 
-        std::string value(uint8_t *ptr) const override {
+        std::string value(std::uint8_t *ptr) const override {
             T val = *reinterpret_cast<T *>(ptr);
 
             if (0 < val && val <= 1e-5) {
@@ -57,8 +57,8 @@ namespace nx::foundation {
     struct IntDType : public DType {
     public:
         IntDType(DTypeKind kind, usize size) : DType(kind, size) {}
-        std::string value(uint8_t *ptr) const override { return std::to_string(*reinterpret_cast<T *>(ptr)); }
-        usize bit_cast(uint8_t *ptr) const override { return *reinterpret_cast<T *>(ptr); }
+        std::string value(std::uint8_t *ptr) const override { return std::to_string(*reinterpret_cast<T *>(ptr)); }
+        usize bit_cast(std::uint8_t *ptr) const override { return *reinterpret_cast<T *>(ptr); }
         usize max() const override { return std::numeric_limits<T>::max(); }
         usize min() const override { return std::numeric_limits<T>::min(); }
     };
@@ -66,7 +66,7 @@ namespace nx::foundation {
     struct F32 : public FloatDtype<float> {
     public:
         F32() : FloatDtype<float>(4) {}
-        usize bit_cast(uint8_t *ptr) const override { return std::bit_cast<int>(*reinterpret_cast<float *>(ptr)); }
+        usize bit_cast(std::uint8_t *ptr) const override { return std::bit_cast<int>(*reinterpret_cast<float *>(ptr)); }
         usize max() const override { return std::bit_cast<int>(std::numeric_limits<float>::infinity()); }
         usize min() const override { return std::bit_cast<int>(-std::numeric_limits<float>::infinity()); }
     };
@@ -74,8 +74,8 @@ namespace nx::foundation {
     struct B8 : public DType {
     public:
         B8() : DType(DTypeKind::Bool, 1) {}
-        std::string value(uint8_t *ptr) const override { return *ptr ? "true" : "false"; }
-        usize bit_cast(uint8_t *ptr) const override { return *ptr; }
+        std::string value(std::uint8_t *ptr) const override { return *ptr ? "true" : "false"; }
+        usize bit_cast(std::uint8_t *ptr) const override { return *ptr; }
         usize max() const override { return std::numeric_limits<bool>::max(); }
         usize min() const override { return std::numeric_limits<bool>::min(); }
     };
@@ -99,7 +99,7 @@ namespace nx::foundation {
     usize numeric_bitcast(const DType *dtype, T constant) {
         if (is_float(dtype)) {
             // TODO: extend this to other floating-point types
-            return std::bit_cast<uint32_t>(static_cast<float>(constant));
+            return std::bit_cast<std::uint32_t>(static_cast<float>(constant));
         } else {
             return static_cast<usize>(constant);
         }

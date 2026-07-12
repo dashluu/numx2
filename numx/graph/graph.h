@@ -7,7 +7,7 @@ namespace nx::graph {
     class Graph : public std::enable_shared_from_this<Graph> {
     protected:
         OpPtr m_output;
-        std::unordered_set<uintptr_t> m_marked;
+        std::unordered_set<std::uintptr_t> m_marked;
         std::vector<Op *> m_fw_tape;
         std::vector<Op *> m_bw_tape;
 

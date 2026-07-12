@@ -15,23 +15,21 @@ namespace nx::runtime::metal {
     class MTLEncoder {
     private:
         MTLContext *m_ctx;
-        MTL::CommandBuffer *m_cmd_buff;
-        MTL::ComputeCommandEncoder *m_encoder;
+        MTL4::ComputeCommandEncoder *m_encoder;
+        NS::SharedPtr<MTL4::ArgumentTable> m_arg_table;
+        NS::SharedPtr<MTL::ResidencySet> m_residency_set;
+        NS::SharedPtr<MTL::SharedEvent> m_event;
         std::vector<mtl_usize *> m_encoded_buffs;
         std::vector<MTL::Buffer *> m_mtl_buffs;
         usize m_buff_idx = 0;
 
     public:
-        explicit MTLEncoder(RuntimeContext *ctx) {
-            m_ctx = static_cast<MTLContext *>(ctx);
-            m_cmd_buff = m_ctx->cmd_queue()->commandBuffer();
-            m_encoder = m_cmd_buff->computeCommandEncoder();
-        }
-
+        MTLEncoder(RuntimeContext *ctx,
+                   MTL4::ArgumentTableDescriptor *arg_table_desc,
+                   MTL::ResidencySetDescriptor *residency_set_desc);
         MTLEncoder(const MTLEncoder &) = delete;
         MTLEncoder(MTLEncoder &&) noexcept = delete;
         ~MTLEncoder();
-
         MTLEncoder &operator=(const MTLEncoder &) = delete;
         MTLEncoder &operator=(MTLEncoder &&) noexcept = delete;
         void encode_mtl_buffer(const void *buff, usize size);
@@ -43,10 +41,9 @@ namespace nx::runtime::metal {
             encode_mtl_buffer(buff.ptr(), buff.nbytes());
         }
 
-        void set_pipeline_state(const std::string &kernel_name);
+        void use_kernel(const std::string &kernel_name);
         void dispatch_threads(usize grid_nthread, usize threadgroup_nthread);
         void dispatch_threads(MTL::Size grid_size, MTL::Size threadgroup_size);
-        void wait_to_complete() { m_cmd_buff->waitUntilCompleted(); }
-        double time_to_complete();
+        void commit();
     };
 } // namespace nx::runtime::metal

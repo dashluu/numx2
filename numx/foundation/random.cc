@@ -4,7 +4,7 @@ namespace nx::foundation {
     void RandomKeyGenerator::update_counter() {
         std::uint32_t ctr_x = m_counter + 1;
         std::uint32_t ctr_y = ctr_x + 1;
-        m_counter = static_cast<uint64_t>(ctr_x) << 32 | ctr_y;
+        m_counter = static_cast<std::uint64_t>(ctr_x) << 32 | ctr_y;
     }
 
     std::uint64_t RandomKeyGenerator::next() {
@@ -45,6 +45,6 @@ namespace nx::foundation {
             }
         }
 
-        return static_cast<uint64_t>(X_x) << 32 | X_y;
+        return static_cast<std::uint64_t>(X_x) << 32 | X_y;
     }
 } // namespace nx::foundation

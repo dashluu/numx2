@@ -13,7 +13,7 @@ namespace nx::foundation {
         void update_counter();
 
     public:
-        explicit RandomKeyGenerator(uint64_t seed) : m_key(seed) {}
+        explicit RandomKeyGenerator(std::uint64_t seed) : m_key(seed) {}
         RandomKeyGenerator(const RandomKeyGenerator &) = delete;
         RandomKeyGenerator(RandomKeyGenerator &&) noexcept = delete;
         ~RandomKeyGenerator() = default;
@@ -24,11 +24,11 @@ namespace nx::foundation {
 
     using RandomKeyGeneratorPtr = std::unique_ptr<RandomKeyGenerator>;
 
-    inline std::unique_ptr<RandomKeyGenerator> make_random_key_generator(uint64_t seed) {
+    inline std::unique_ptr<RandomKeyGenerator> make_random_key_generator(std::uint64_t seed) {
         return std::make_unique<RandomKeyGenerator>(seed);
     }
 
-    inline static std::optional<uint64_t> s_seed;
+    inline static std::optional<std::uint64_t> s_seed;
     std::uint64_t current_time_seed();
 
     inline std::uint64_t seed() {

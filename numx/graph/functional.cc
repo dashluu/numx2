@@ -10,7 +10,7 @@ namespace nx::graph {
 
         ArrayIterator iter(descriptor);
         iter.begin();
-        uint8_t *ptr = iter.next();
+        std::uint8_t *ptr = iter.next();
         return descriptor.dtype()->bit_cast(ptr);
     }
 
