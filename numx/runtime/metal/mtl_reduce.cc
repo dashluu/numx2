@@ -14,25 +14,25 @@ namespace nx::runtime::metal {
         std::uint32_t buff_count = strided ? 7 : 4;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
-        MTLEncoder encoder(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
+        MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         mtl_usize offset[] = {static_cast<mtl_usize>(in_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
-        encoder.encode_mtl_buffer(&mtl_numel, sizeof(mtl_usize));
-        encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
+        runner.encode_mtl_buffer(&mtl_numel, sizeof(mtl_usize));
+        runner.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
 
         if (strided) {
             mtl_usize ndim = in_descriptor.ndim();
-            encoder.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
-            encoder.encode_view(in_descriptor);
-            encoder.encode_stride(in_descriptor);
+            runner.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
+            runner.encode_view(in_descriptor);
+            runner.encode_stride(in_descriptor);
         }
 
-        encoder.encode_array_buffer(in_descriptor);
-        encoder.encode_array_buffer(out_descriptor);
+        runner.encode_array_buffer(in_descriptor);
+        runner.encode_array_buffer(out_descriptor);
 
         // Configure kernel
         const DType *dtype = in_descriptor.dtype();
         std::string kernel_name = std::format("{}{}_all_{}", strided ? "strided_" : "", out_op->opname(), dtype->str());
-        encoder.use_kernel(kernel_name);
+        runner.commit(kernel_name);
 
         // Calculate thread configuration
         // Make sure the number of threads aligned to simd size
@@ -42,8 +42,8 @@ namespace nx::runtime::metal {
         auto threadgroup_size = MTL::Size::Make(threadgroup_nthread, 1, 1);
 
         // Dispatch kernel
-        encoder.dispatch_threads(grid_size, threadgroup_size);
-        encoder.commit();
+        runner.dispatch_threads(grid_size, threadgroup_size);
+        runner.run();
         pool->release();
     }
 
@@ -82,35 +82,35 @@ namespace nx::runtime::metal {
         std::uint32_t buff_count = strided ? 7 : 4;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
-        MTLEncoder encoder(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
+        MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         mtl_usize offset[] = {static_cast<mtl_usize>(permutation_descriptor.offset()), static_cast<mtl_usize>(out_descriptor.offset())};
-        encoder.encode_mtl_buffer(&mtl_ncol, sizeof(mtl_usize));
-        encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
+        runner.encode_mtl_buffer(&mtl_ncol, sizeof(mtl_usize));
+        runner.encode_mtl_buffer(offset, sizeof(mtl_usize) * 2);
 
         if (strided) {
             mtl_usize ndim = in_descriptor.ndim();
-            encoder.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
-            encoder.encode_view(permutation_descriptor);
-            encoder.encode_stride(permutation_descriptor);
+            runner.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
+            runner.encode_view(permutation_descriptor);
+            runner.encode_stride(permutation_descriptor);
         }
 
-        encoder.encode_array_buffer(permutation_descriptor);
-        encoder.encode_array_buffer(out_descriptor);
+        runner.encode_array_buffer(permutation_descriptor);
+        runner.encode_array_buffer(out_descriptor);
 
         // Configure kernel
         const DType *dtype = permutation_descriptor.dtype();
         auto [row_groups, col_groups] = select_reduce_col_kernel_size(nrow, ncol);
         // std::println("row_groups: {}, col_groups: {}", row_groups, col_groups);
         std::string kernel_name = std::format("{}{}_col_{}x{}_{}", strided ? "strided_" : "", out_op->opname(), row_groups, col_groups, dtype->str());
-        encoder.use_kernel(kernel_name);
+        runner.commit(kernel_name);
 
         // Calculate thread configuration
         auto grid_size = MTL::Size::Make(foundation::align_to(ncol, s_simd_size), nrow, 1);
         auto threadgroup_size = MTL::Size::Make(col_groups * s_simd_size, row_groups, 1);
 
         // Dispatch kernel
-        encoder.dispatch_threads(grid_size, threadgroup_size);
-        encoder.commit();
+        runner.dispatch_threads(grid_size, threadgroup_size);
+        runner.run();
         pool->release();
     }
 } // namespace nx::runtime::metal

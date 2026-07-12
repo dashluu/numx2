@@ -1,10 +1,9 @@
-#include "mtl_encoder.h"
 #include "mtl_runtime.h"
 
 namespace nx::runtime::metal {
-    MTLEncoder::MTLEncoder(RuntimeContext *ctx,
-                           MTL4::ArgumentTableDescriptor *arg_table_desc,
-                           MTL::ResidencySetDescriptor *residency_set_desc) {
+    MTLRunner::MTLRunner(RuntimeContext *ctx,
+                         MTL4::ArgumentTableDescriptor *arg_table_desc,
+                         MTL::ResidencySetDescriptor *residency_set_desc) {
         m_ctx = static_cast<MTLContext *>(ctx);
         auto device = m_ctx->mtl_device();
         NS::Error *error = nullptr;
@@ -30,7 +29,7 @@ namespace nx::runtime::metal {
         m_event = NS::TransferPtr<MTL::SharedEvent>(device->newSharedEvent());
     }
 
-    MTLEncoder::~MTLEncoder() {
+    MTLRunner::~MTLRunner() {
         for (auto &buff : m_encoded_buffs) {
             delete[] buff;
         }
@@ -40,7 +39,7 @@ namespace nx::runtime::metal {
         }
     }
 
-    void MTLEncoder::encode_mtl_buffer(const void *buff, usize size) {
+    void MTLRunner::encode_mtl_buffer(const void *buff, usize size) {
         MTL::Buffer *mtl_buff = m_ctx->mtl_device()->newBuffer(buff, size, MTL::ResourceStorageModeShared, nullptr);
         m_mtl_buffs.emplace_back(mtl_buff);
         m_residency_set->addAllocation(mtl_buff);
@@ -48,7 +47,7 @@ namespace nx::runtime::metal {
         ++m_buff_idx;
     }
 
-    void MTLEncoder::encode_view(const ArrayDescriptor &descriptor) {
+    void MTLRunner::encode_view(const ArrayDescriptor &descriptor) {
         const ShapeView &view = descriptor.view();
         usize ndim = descriptor.ndim();
         mtl_usize *view_buff = new mtl_usize[ndim];
@@ -61,7 +60,7 @@ namespace nx::runtime::metal {
         encode_mtl_buffer(view_buff, ndim * sizeof(mtl_usize));
     }
 
-    void MTLEncoder::encode_stride(const ArrayDescriptor &descriptor) {
+    void MTLRunner::encode_stride(const ArrayDescriptor &descriptor) {
         const ShapeStride &stride = descriptor.stride();
         usize ndim = descriptor.ndim();
         mtl_usize *stride_buff = new mtl_usize[ndim];
@@ -74,7 +73,7 @@ namespace nx::runtime::metal {
         encode_mtl_buffer(stride_buff, ndim * sizeof(mtl_usize));
     }
 
-    void MTLEncoder::use_kernel(const std::string &kernel_name) {
+    void MTLRunner::commit(const std::string &kernel_name) {
         MTLKernel *kernel = m_ctx->kernel(kernel_name);
 
         if (!kernel) {
@@ -88,17 +87,17 @@ namespace nx::runtime::metal {
         m_encoder->setArgumentTable(m_arg_table.get());
     }
 
-    void MTLEncoder::dispatch_threads(usize grid_nthread, usize threadgroup_nthread) {
+    void MTLRunner::dispatch_threads(usize grid_nthread, usize threadgroup_nthread) {
         MTL::Size grid_size = MTL::Size::Make(grid_nthread, 1, 1);
         MTL::Size threadgroup_size = MTL::Size::Make(threadgroup_nthread, 1, 1);
         dispatch_threads(grid_size, threadgroup_size);
     }
 
-    void MTLEncoder::dispatch_threads(MTL::Size grid_size, MTL::Size threadgroup_size) {
+    void MTLRunner::dispatch_threads(MTL::Size grid_size, MTL::Size threadgroup_size) {
         m_encoder->dispatchThreads(grid_size, threadgroup_size);
     }
 
-    void MTLEncoder::commit() {
+    void MTLRunner::run() {
         auto cmd_buff = m_ctx->cmd_buff();
         m_encoder->endEncoding();
         cmd_buff->endCommandBuffer();

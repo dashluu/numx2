@@ -12,7 +12,7 @@ namespace nx::runtime::metal {
     using mtl_usize = std::uint32_t;
     using mtl_isize = std::int32_t;
 
-    class MTLEncoder {
+    class MTLRunner {
     private:
         MTLContext *m_ctx;
         MTL4::ComputeCommandEncoder *m_encoder;
@@ -24,14 +24,14 @@ namespace nx::runtime::metal {
         usize m_buff_idx = 0;
 
     public:
-        MTLEncoder(RuntimeContext *ctx,
-                   MTL4::ArgumentTableDescriptor *arg_table_desc,
-                   MTL::ResidencySetDescriptor *residency_set_desc);
-        MTLEncoder(const MTLEncoder &) = delete;
-        MTLEncoder(MTLEncoder &&) noexcept = delete;
-        ~MTLEncoder();
-        MTLEncoder &operator=(const MTLEncoder &) = delete;
-        MTLEncoder &operator=(MTLEncoder &&) noexcept = delete;
+        MTLRunner(RuntimeContext *ctx,
+                  MTL4::ArgumentTableDescriptor *arg_table_desc,
+                  MTL::ResidencySetDescriptor *residency_set_desc);
+        MTLRunner(const MTLRunner &) = delete;
+        MTLRunner(MTLRunner &&) noexcept = delete;
+        ~MTLRunner();
+        MTLRunner &operator=(const MTLRunner &) = delete;
+        MTLRunner &operator=(MTLRunner &&) noexcept = delete;
         void encode_mtl_buffer(const void *buff, usize size);
         void encode_view(const ArrayDescriptor &descriptor);
         void encode_stride(const ArrayDescriptor &descriptor);
@@ -41,9 +41,9 @@ namespace nx::runtime::metal {
             encode_mtl_buffer(buff.ptr(), buff.nbytes());
         }
 
-        void use_kernel(const std::string &kernel_name);
+        void commit(const std::string &kernel_name);
         void dispatch_threads(usize grid_nthread, usize threadgroup_nthread);
         void dispatch_threads(MTL::Size grid_size, MTL::Size threadgroup_size);
-        void commit();
+        void run();
     };
 } // namespace nx::runtime::metal

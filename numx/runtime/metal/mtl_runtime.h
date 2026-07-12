@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../runtime.h"
-#include "mtl_encoder.h"
+#include "mtl_runner.h"
 
 namespace nx::runtime::metal {
     using foundation::ArrayBufferBorrower;

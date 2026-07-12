@@ -1,4 +1,3 @@
-#include "mtl_context.h"
 #include "mtl_runtime.h"
 
 namespace nx::runtime::metal {
@@ -8,22 +7,22 @@ namespace nx::runtime::metal {
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
         arg_table_desc->setMaxBufferBindCount(4);
         residency_set_desc->setInitialCapacity(4);
-        MTLEncoder encoder(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
+        MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &l_descriptor = l_op->descriptor();
         const ArrayDescriptor &r_descriptor = r_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
         mtl_usize offset[] = {static_cast<mtl_usize>(l_descriptor.offset()),
                               static_cast<mtl_usize>(r_descriptor.offset()),
                               static_cast<mtl_usize>(out_descriptor.offset())};
-        encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
-        encoder.encode_array_buffer(l_descriptor);
-        encoder.encode_array_buffer(r_descriptor);
-        encoder.encode_array_buffer(out_descriptor);
+        runner.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
+        runner.encode_array_buffer(l_descriptor);
+        runner.encode_array_buffer(r_descriptor);
+        runner.encode_array_buffer(out_descriptor);
         std::string kernel_name = std::format("{}_{}", out_op->opname(), l_descriptor.dtype()->str());
-        encoder.use_kernel(kernel_name);
+        runner.commit(kernel_name);
         usize numel = l_descriptor.numel();
-        encoder.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
-        encoder.commit();
+        runner.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
+        runner.run();
         pool->release();
     }
 
@@ -33,7 +32,7 @@ namespace nx::runtime::metal {
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
         arg_table_desc->setMaxBufferBindCount(10);
         residency_set_desc->setInitialCapacity(10);
-        MTLEncoder encoder(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
+        MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &l_descriptor = l_op->descriptor();
         const ArrayDescriptor &r_descriptor = r_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
@@ -42,21 +41,21 @@ namespace nx::runtime::metal {
                               static_cast<mtl_usize>(r_descriptor.offset()),
                               static_cast<mtl_usize>(out_descriptor.offset())};
         bool strided[] = {!l_descriptor.is_contiguous(), !r_descriptor.is_contiguous(), !out_descriptor.is_contiguous()};
-        encoder.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
-        encoder.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
-        encoder.encode_view(l_descriptor);
-        encoder.encode_stride(l_descriptor);
-        encoder.encode_stride(r_descriptor);
-        encoder.encode_stride(out_descriptor);
-        encoder.encode_mtl_buffer(strided, sizeof(bool) * 3);
-        encoder.encode_array_buffer(l_descriptor);
-        encoder.encode_array_buffer(r_descriptor);
-        encoder.encode_array_buffer(out_descriptor);
+        runner.encode_mtl_buffer(&ndim, sizeof(mtl_usize));
+        runner.encode_mtl_buffer(offset, sizeof(mtl_usize) * 3);
+        runner.encode_view(l_descriptor);
+        runner.encode_stride(l_descriptor);
+        runner.encode_stride(r_descriptor);
+        runner.encode_stride(out_descriptor);
+        runner.encode_mtl_buffer(strided, sizeof(bool) * 3);
+        runner.encode_array_buffer(l_descriptor);
+        runner.encode_array_buffer(r_descriptor);
+        runner.encode_array_buffer(out_descriptor);
         std::string kernel_name = std::format("strided_{}_{}", out_op->opname(), l_descriptor.dtype()->str());
-        encoder.use_kernel(kernel_name);
+        runner.commit(kernel_name);
         usize numel = l_descriptor.numel();
-        encoder.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
-        encoder.commit();
+        runner.dispatch_threads(numel, std::min(numel, s_threadgroup_size));
+        runner.run();
         pool->release();
     }
 
