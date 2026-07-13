@@ -5,8 +5,8 @@ namespace nx::runtime::metal {
         NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        arg_table_desc->setMaxBufferBindCount(2);
-        residency_set_desc->setInitialCapacity(2);
+        arg_table_desc->setMaxBufferBindCount(s_full_buffer_count);
+        residency_set_desc->setInitialCapacity(s_full_buffer_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &descriptor = op->descriptor();
         mtl_usize mtl_constant = constant;
@@ -24,8 +24,8 @@ namespace nx::runtime::metal {
         NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        arg_table_desc->setMaxBufferBindCount(3);
-        residency_set_desc->setInitialCapacity(3);
+        arg_table_desc->setMaxBufferBindCount(s_arange_buffer_count);
+        residency_set_desc->setInitialCapacity(s_arange_buffer_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &descriptor = op->descriptor();
         mtl_usize mtl_start = start;
@@ -45,8 +45,8 @@ namespace nx::runtime::metal {
         NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        arg_table_desc->setMaxBufferBindCount(5);
-        residency_set_desc->setInitialCapacity(5);
+        arg_table_desc->setMaxBufferBindCount(s_uniform_buffer_count);
+        residency_set_desc->setInitialCapacity(s_uniform_buffer_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &descriptor = op->descriptor();
         usize numel = descriptor.numel();

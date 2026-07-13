@@ -23,13 +23,12 @@ namespace nx::optim {
         // Note: state is guaranteed to be initialized before accessing
         // Accumulate velocity with momentum decay
         // Prevent the state from being a part of the computational graph
-        Array &v = state["v"];
-        Array velocity = v.detach();
-        velocity *= m_momentum;
+        Array v = state["v"].detach();
+        v *= m_momentum;
         // Apply dampening to reduce initial momentum effect
-        velocity += m_dampening > 0.0f ? (1 - m_dampening) * grad : grad;
+        v += m_dampening > 0.0f ? (1 - m_dampening) * grad : grad;
         // Nesterov accelerated gradient: look ahead before applying momentum
-        Array grad_update = m_nesterov ? m_momentum * velocity + grad : velocity;
+        Array grad_update = m_nesterov ? m_momentum * v + grad : v;
         // Apply parameter update
         param -= m_learning_rate * grad_update;
     }

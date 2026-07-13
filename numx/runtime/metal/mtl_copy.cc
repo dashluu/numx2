@@ -5,8 +5,8 @@ namespace nx::runtime::metal {
         NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        arg_table_desc->setMaxBufferBindCount(3);
-        residency_set_desc->setInitialCapacity(3);
+        arg_table_desc->setMaxBufferBindCount(s_contiguous_copy_buffer_count);
+        residency_set_desc->setInitialCapacity(s_contiguous_copy_buffer_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &in_descriptor = in_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();
@@ -26,8 +26,8 @@ namespace nx::runtime::metal {
         NS::AutoreleasePool *pool = NS::AutoreleasePool::alloc()->init();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        arg_table_desc->setMaxBufferBindCount(8);
-        residency_set_desc->setInitialCapacity(8);
+        arg_table_desc->setMaxBufferBindCount(s_strided_copy_buffer_count);
+        residency_set_desc->setInitialCapacity(s_strided_copy_buffer_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
         const ArrayDescriptor &in_descriptor = in_op->descriptor();
         const ArrayDescriptor &out_descriptor = out_op->descriptor();

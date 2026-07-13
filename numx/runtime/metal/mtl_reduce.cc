@@ -11,7 +11,7 @@ namespace nx::runtime::metal {
         bool strided = !in_descriptor.is_contiguous();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        std::uint32_t buff_count = strided ? 7 : 4;
+        std::uint32_t buff_count = strided ? s_strided_reduce_all_buffer_count : s_contiguous_reduce_all_buffer_count;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
@@ -79,7 +79,7 @@ namespace nx::runtime::metal {
         bool strided = !permutation_descriptor.is_contiguous();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        std::uint32_t buff_count = strided ? 7 : 4;
+        std::uint32_t buff_count = strided ? s_strided_reduce_col_buffer_count : s_contiguous_reduce_col_buffer_count;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
@@ -99,14 +99,14 @@ namespace nx::runtime::metal {
 
         // Configure kernel
         const DType *dtype = permutation_descriptor.dtype();
-        auto [row_groups, col_groups] = select_reduce_col_kernel_size(nrow, ncol);
+        auto [row_group_size, col_group_size] = select_reduce_col_kernel_size(nrow, ncol);
         // std::println("row_groups: {}, col_groups: {}", row_groups, col_groups);
-        std::string kernel_name = std::format("{}{}_col_{}x{}_{}", strided ? "strided_" : "", out_op->opname(), row_groups, col_groups, dtype->str());
+        std::string kernel_name = std::format("{}{}_col_{}x{}_{}", strided ? "strided_" : "", out_op->opname(), row_group_size, col_group_size, dtype->str());
         runner.commit(kernel_name);
 
         // Calculate thread configuration
         auto grid_size = MTL::Size::Make(foundation::align_to(ncol, s_simd_size), nrow, 1);
-        auto threadgroup_size = MTL::Size::Make(col_groups * s_simd_size, row_groups, 1);
+        auto threadgroup_size = MTL::Size::Make(col_group_size * s_simd_size, row_group_size, 1);
 
         // Dispatch kernel
         runner.dispatch_threads(grid_size, threadgroup_size);

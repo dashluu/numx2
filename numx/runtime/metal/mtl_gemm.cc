@@ -21,7 +21,7 @@ namespace nx::runtime::metal {
         bool strided = !l_descriptor.is_contiguous() || !r_descriptor.is_contiguous();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        std::uint32_t buff_count = strided ? 8 : 6;
+        std::uint32_t buff_count = strided ? s_strided_simd_gevv_buffer_count : s_contiguous_simd_gevv_buffer_count;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
@@ -56,7 +56,7 @@ namespace nx::runtime::metal {
         bool strided = !l_descriptor.is_contiguous() || !r_descriptor.is_contiguous();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        std::uint32_t buff_count = strided ? 8 : 6;
+        std::uint32_t buff_count = strided ? s_strided_gemm2d_buffer_count : s_contiguous_gemm2d_buffer_count;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
@@ -106,7 +106,7 @@ namespace nx::runtime::metal {
         bool strided = !l_descriptor.is_contiguous() || !r_descriptor.is_contiguous();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        std::uint32_t buff_count = strided ? 9 : 7;
+        std::uint32_t buff_count = strided ? s_strided_gemm3d_buffer_count : s_contiguous_gemm3d_buffer_count;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());

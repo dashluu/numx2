@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../nn/linear.h"
+#include "../optim/adam.h"
 #include "../optim/sgd.h"
 #include <nanobind/nanobind.h>
 #include <nanobind/ndarray.h>

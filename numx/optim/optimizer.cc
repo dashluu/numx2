@@ -49,5 +49,7 @@ namespace nx::optim {
         for (Array &param : m_params) {
             param.eval();
         }
+
+        ++m_step;
     }
 } // namespace nx::optim

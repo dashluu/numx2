@@ -180,4 +180,6 @@ NB_MODULE(nx, m) {
 
     nb::class_<nxo::SGD, nxo::Optimizer>(m_optim, "SGD")
         .def(nb::init<float, float, float, float, bool>(), "lr"_a, "momentum"_a = 0.0, "weight_decay"_a = 0.0, "dampening"_a = 0.0, "nesterov"_a = false, "Stochastic Gradient Descent optimizer");
+    nb::class_<nxo::Adam, nxo::Optimizer>(m_optim, "Adam")
+        .def(nb::init<float, float, float, float, bool>(), "lr"_a, "beta1"_a = 0.9, "beta2"_a = 0.999, "epsilon"_a = 1e-8, "bias_correction"_a = false, "Adam optimizer");
 }

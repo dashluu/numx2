@@ -19,6 +19,25 @@ namespace nx::runtime::metal {
         static constexpr usize s_simd_size = 32;
         static constexpr usize s_threadgroup_size = 256;
         static constexpr usize s_max_threadgroup_size = 1024;
+        static constexpr usize s_full_buffer_count = 2;
+        static constexpr usize s_arange_buffer_count = 3;
+        static constexpr usize s_uniform_buffer_count = 5;
+        static constexpr usize s_contiguous_binary_buffer_count = 4;
+        static constexpr usize s_strided_binary_buffer_count = 10;
+        static constexpr usize s_contiguous_unary_buffer_count = 3;
+        static constexpr usize s_strided_unary_buffer_count = 8;
+        static constexpr usize s_contiguous_copy_buffer_count = 3;
+        static constexpr usize s_strided_copy_buffer_count = 8;
+        static constexpr usize s_contiguous_simd_gevv_buffer_count = 6;
+        static constexpr usize s_strided_simd_gevv_buffer_count = 8;
+        static constexpr usize s_contiguous_gemm2d_buffer_count = 6;
+        static constexpr usize s_strided_gemm2d_buffer_count = 8;
+        static constexpr usize s_contiguous_gemm3d_buffer_count = 7;
+        static constexpr usize s_strided_gemm3d_buffer_count = 9;
+        static constexpr usize s_contiguous_reduce_all_buffer_count = 4;
+        static constexpr usize s_strided_reduce_all_buffer_count = 7;
+        static constexpr usize s_contiguous_reduce_col_buffer_count = 4;
+        static constexpr usize s_strided_reduce_col_buffer_count = 7;
 
         void run_full_kernel(Op *op, usize constant) override;
         void run_arange_kernel(Op *op, usize start, usize step) override;

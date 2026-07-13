@@ -13,6 +13,7 @@ namespace nx::optim {
         float m_learning_rate;
         ArrayVec m_params;
         ArrayVec m_grads;
+        std::size_t m_step = 1;
 
     public:
         explicit Optimizer(float learning_rate) : m_learning_rate(learning_rate) {}

@@ -18,7 +18,7 @@ void run_multipass_with_vanilla_gd();
 void run_multipass_with_sgd();
 
 int main() {
-    run_basic();
+    run_advanced();
     return 0;
 }
 
