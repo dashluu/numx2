@@ -47,9 +47,9 @@ namespace nx::runtime::metal {
         ++m_buff_idx;
     }
 
-    void MTLRunner::encode_view(const ArrayDescriptor &descriptor) {
-        const ShapeView &view = descriptor.view();
-        usize ndim = descriptor.ndim();
+    void MTLRunner::encode_view(const Shape &shape) {
+        const ShapeView &view = shape.get_view();
+        usize ndim = shape.get_ndim();
         mtl_usize *view_buff = new mtl_usize[ndim];
 
         for (usize i = 0; i < ndim; ++i) {
@@ -60,9 +60,9 @@ namespace nx::runtime::metal {
         encode_mtl_buffer(view_buff, ndim * sizeof(mtl_usize));
     }
 
-    void MTLRunner::encode_stride(const ArrayDescriptor &descriptor) {
-        const ShapeStride &stride = descriptor.stride();
-        usize ndim = descriptor.ndim();
+    void MTLRunner::encode_stride(const Shape &shape) {
+        const ShapeStride &stride = shape.get_stride();
+        usize ndim = shape.get_ndim();
         mtl_usize *stride_buff = new mtl_usize[ndim];
 
         for (usize i = 0; i < ndim; ++i) {
@@ -95,6 +95,10 @@ namespace nx::runtime::metal {
 
     void MTLRunner::dispatch_threads(MTL::Size grid_size, MTL::Size threadgroup_size) {
         m_encoder->dispatchThreads(grid_size, threadgroup_size);
+    }
+
+    void MTLRunner::dispatch_threadgroups(MTL::Size threadgroups_per_grid, MTL::Size threads_per_threadgroup) {
+        m_encoder->dispatchThreadgroups(threadgroups_per_grid, threads_per_threadgroup);
     }
 
     void MTLRunner::run() {

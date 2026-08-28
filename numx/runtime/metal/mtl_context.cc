@@ -129,8 +129,10 @@ namespace nx::runtime::metal {
         init_kernels("strided_simd_gevv", DTypeKind::Numeric);
         init_kernels("naive_gemm2d", DTypeKind::Numeric);
         init_kernels("tiled_gemm2d", DTypeKind::Float);
+        init_kernels("tensor_gemm2d", DTypeKind::Float);
         init_kernels("naive_gemm3d", DTypeKind::Numeric);
         init_kernels("tiled_gemm3d", DTypeKind::Float);
+        init_kernels("tensor_gemm3d", DTypeKind::Float);
         init_kernels("strided_naive_gemm2d", DTypeKind::Numeric);
         init_kernels("strided_tiled_gemm2d", DTypeKind::Float);
         init_kernels("strided_naive_gemm3d", DTypeKind::Numeric);

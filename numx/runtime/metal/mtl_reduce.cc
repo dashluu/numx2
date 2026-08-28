@@ -11,7 +11,7 @@ namespace nx::runtime::metal {
         bool strided = !in_descriptor.is_contiguous();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        std::uint32_t buff_count = strided ? s_strided_reduce_all_buffer_count : s_contiguous_reduce_all_buffer_count;
+        usize buff_count = strided ? s_strided_reduce_all_buffer_count : s_contiguous_reduce_all_buffer_count;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());
@@ -79,7 +79,7 @@ namespace nx::runtime::metal {
         bool strided = !permutation_descriptor.is_contiguous();
         NS::SharedPtr<MTL4::ArgumentTableDescriptor> arg_table_desc = NS::TransferPtr(MTL4::ArgumentTableDescriptor::alloc()->init());
         NS::SharedPtr<MTL::ResidencySetDescriptor> residency_set_desc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
-        std::uint32_t buff_count = strided ? s_strided_reduce_col_buffer_count : s_contiguous_reduce_col_buffer_count;
+        usize buff_count = strided ? s_strided_reduce_col_buffer_count : s_contiguous_reduce_col_buffer_count;
         arg_table_desc->setMaxBufferBindCount(buff_count);
         residency_set_desc->setInitialCapacity(buff_count);
         MTLRunner runner(m_ctx.get(), arg_table_desc.get(), residency_set_desc.get());

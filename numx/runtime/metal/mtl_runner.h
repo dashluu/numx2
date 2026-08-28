@@ -5,6 +5,7 @@
 namespace nx::runtime::metal {
     using foundation::ArrayBuffer;
     using foundation::ArrayDescriptor;
+    using foundation::Shape;
     using foundation::ShapeStride;
     using foundation::ShapeView;
     using memory::Buffer;
@@ -33,8 +34,10 @@ namespace nx::runtime::metal {
         MTLRunner &operator=(const MTLRunner &) = delete;
         MTLRunner &operator=(MTLRunner &&) noexcept = delete;
         void encode_mtl_buffer(const void *buff, usize size);
-        void encode_view(const ArrayDescriptor &descriptor);
-        void encode_stride(const ArrayDescriptor &descriptor);
+        void encode_view(const Shape &shape);
+        void encode_view(const ArrayDescriptor &descriptor) { encode_view(descriptor.shape()); }
+        void encode_stride(const Shape &shape);
+        void encode_stride(const ArrayDescriptor &descriptor) { encode_stride(descriptor.shape()); }
 
         void encode_array_buffer(const ArrayDescriptor &descriptor) {
             const ArrayBuffer &buff = descriptor.buffer();
@@ -44,6 +47,7 @@ namespace nx::runtime::metal {
         void commit(const std::string &kernel_name);
         void dispatch_threads(usize grid_nthread, usize threadgroup_nthread);
         void dispatch_threads(MTL::Size grid_size, MTL::Size threadgroup_size);
+        void dispatch_threadgroups(MTL::Size threadgroups_per_grid, MTL::Size threads_per_threadgroup);
         void run();
     };
 } // namespace nx::runtime::metal
