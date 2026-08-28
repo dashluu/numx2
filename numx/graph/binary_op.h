@@ -84,6 +84,16 @@ namespace nx::graph {
         void backward() override;
     };
 
+    struct PowOp : public ElmwiseBinaryOp {
+    public:
+        static constexpr std::string_view s_opname = "pow";
+
+        PowOp(ArrayDescriptor descriptor, OpPtr lhs, OpPtr rhs, bool in_place) : ElmwiseBinaryOp(std::move(descriptor), lhs, rhs, in_place) {}
+        Opcode opcode() const override { return Opcode::Pow; }
+        std::string_view opname() const override { return s_opname; }
+        void backward() override;
+    };
+
     struct EqOp : public CmpOp {
     public:
         static constexpr std::string_view s_opname = "eq";

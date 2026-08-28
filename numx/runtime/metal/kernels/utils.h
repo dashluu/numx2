@@ -1,5 +1,6 @@
 #pragma once
 
+#include <MetalPerformancePrimitives/MetalPerformancePrimitives.h>
 #include <metal_simdgroup_matrix>
 #include <metal_stdlib>
 

@@ -18,7 +18,7 @@ void run_multipass_with_vanilla_gd();
 void run_multipass_with_sgd();
 
 int main() {
-    run_advanced();
+    run_basic();
     return 0;
 }
 
@@ -29,7 +29,7 @@ void run_basic() {
     std::println("{}\n", x1);
     std::println("{}\n", x2);
     std::println("{}\n", x3);
-    auto x4 = x1 + x2;
+    auto x4 = x1.pow(x2);
     std::println("{}\n", x4);
 }
 

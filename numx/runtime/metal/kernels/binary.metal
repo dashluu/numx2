@@ -31,6 +31,10 @@ kernel void strided_binary(
     output[offset[2] + out_loc] = Op()(lhs[offset[0] + l_loc], rhs[offset[1] + r_loc]);
 }
 
+#define def_binary_float_kernels(opname, op, dtype, T)  \
+template [[host_name(#opname "_" #dtype)]] [[kernel]] decltype(binary<op, T, T>) binary<op, T, T>;                                      \
+template [[host_name("strided_" #opname "_" #dtype)]] [[kernel]] decltype(strided_binary<op, T, T>) strided_binary<op, T, T>;
+
 #define def_binary_kernels(opname, op, dtype, T, R)     \
 template [[host_name(#opname "_" #dtype)]] [[kernel]] decltype(binary<op, T, R>) binary<op, T, R>;                                      \
 template [[host_name("strided_" #opname "_" #dtype)]] [[kernel]] decltype(strided_binary<op, T, R>) strided_binary<op, T, R>;
@@ -65,6 +69,7 @@ def_binary(add, Add);
 def_binary(sub, Sub);
 def_binary(mul, Mul);
 def_binary(div, Div);
+def_binary_float_kernels(pow, Pow, f32, float);
 def_logic(logic_and, LogicAnd);
 def_logic(logic_or, LogicOr);
 def_bitwise(bitwise_and, BitwiseAnd);

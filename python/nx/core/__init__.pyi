@@ -191,6 +191,11 @@ class Array:
     def __rtruediv__(self, rhs: object) -> Array:
         """Divide two arrays element-wise"""
 
+    def __pow__(self, rhs: object) -> Array:
+        """
+        Raise the left-hand side array to the power in the right-hand side array element-wise
+        """
+
     def __iadd__(self, rhs: object) -> Array:
         """In-place add two arrays element-wise"""
 
@@ -202,6 +207,11 @@ class Array:
 
     def __itruediv__(self, rhs: object) -> Array:
         """In-place divide two arrays element-wise"""
+
+    def __ipow__(self, rhs: object) -> Array:
+        """
+        In-place raise the left-hand side array to the power in the right-hand side array element-wise
+        """
 
     def __matmul__(self, rhs: Array) -> Array:
         """Matrix multiply two arrays"""

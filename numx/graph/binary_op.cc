@@ -60,6 +60,20 @@ namespace nx::graph {
         }
     }
 
+    void PowOp::backward() {
+        // z = x ** y
+        // dx += dz * y * x ** (y-1)
+        // dy += dz * z * ln(x)
+        // Use detach to prevent circular dependencies
+        if (m_lhs->is_grad_enabled()) {
+            m_lhs->zero_and_update_grad(mul(mul(m_grad, graph::detach(m_rhs)), graph::pow(graph::detach(m_lhs), sub(graph::detach(m_rhs), 1))));
+        }
+
+        if (m_rhs->is_grad_enabled()) {
+            m_rhs->zero_and_update_grad(mul(mul(m_grad, detach()), log(graph::detach(m_lhs))));
+        }
+    }
+
     void GemmOp::backward() {
         // Transpose the last two dimensions of m_lhs and m_rhs
         // z = x @ y

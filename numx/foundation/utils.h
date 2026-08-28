@@ -7,6 +7,7 @@
 #include <format>
 #include <functional>
 #include <iostream>
+#include <numbers>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -14,7 +15,7 @@
 
 namespace nx::foundation {
     using usize = std::size_t;
-    using isize = std::ptrdiff_t;
+    using isize = std::int64_t;
     constexpr usize uone = 1;
 
     template <class T>

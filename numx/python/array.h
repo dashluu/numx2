@@ -166,6 +166,14 @@ namespace nx::bind {
         return in_place_binary(array, rhs, [](auto &a, const auto &b) { return a /= b; });
     }
 
+    inline Array pow(const Array &array, const nb::object &rhs) {
+        return binary(array, rhs, [](const auto &a, const auto &b) { return a.pow(b); });
+    }
+
+    inline Array i_pow(Array &array, const nb::object &rhs) {
+        return in_place_binary(array, rhs, [](auto &a, const auto &b) { return a.i_pow(b); });
+    }
+
     inline Array eq(const Array &array, const nb::object &rhs) {
         return binary(array, rhs, [](const auto &a, const auto &b) { return a == b; });
     }

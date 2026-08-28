@@ -64,6 +64,9 @@ namespace nx::runtime::metal {
     }
 
     void MTLContext::init_binary_kernels() {
+        std::vector<std::string_view> binary_float_name_views = {
+            graph::PowOp::s_opname};
+
         std::vector<std::string_view> binary_name_views = {
             graph::AddOp::s_opname,
             graph::SubOp::s_opname,
@@ -87,6 +90,8 @@ namespace nx::runtime::metal {
             graph::EqOp::s_opname,
             graph::NeqOp::s_opname};
 
+        init_kernels(binary_float_name_views, DTypeKind::Float);
+        init_strided_kernels(binary_float_name_views, DTypeKind::Float);
         init_kernels(binary_name_views, DTypeKind::Numeric);
         init_strided_kernels(binary_name_views, DTypeKind::Numeric);
         init_kernels(binary_int_name_views, DTypeKind::Int);

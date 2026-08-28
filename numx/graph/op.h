@@ -17,6 +17,7 @@ namespace nx::graph {
         Sub,
         Mul,
         Div,
+        Pow,
         Eq,
         Neq,
         Greater,

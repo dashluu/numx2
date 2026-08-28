@@ -4,11 +4,11 @@ import operator
 
 import numpy as np
 from nx.core import Array, from_numpy
-from utils import np_assert_array
+from utils import ArrayGenerator, RandnGenerator, UniformGenerator, np_assert_array
 
 
 class TestBinary:
-    def binary_no_broadcast(self, name: str, op1, op2):
+    def binary_no_broadcast(self, name: str, op1, op2, generator: ArrayGenerator):
         print(f"{name}:")
 
         test_cases = [
@@ -22,15 +22,15 @@ class TestBinary:
 
         for shape in test_cases:
             print(f"Testing shape: {shape}")
-            np1 = np.random.randn(*shape).astype(np.float32)
-            np2 = np.random.randn(*shape).astype(np.float32)
+            np1 = generator.generate(shape)
+            np2 = generator.generate(shape)
             nx1 = from_numpy(np1)
             nx2 = from_numpy(np2)
             nx3: Array = op1(nx1, nx2)
             np3: np.ndarray = op2(np1, np2)
             np_assert_array(nx3, np3)
 
-    def binary_with_broadcast(self, name: str, op1, op2):
+    def binary_with_broadcast(self, name: str, op1, op2, generator: ArrayGenerator):
         print(f"{name} with broadcast:")
 
         # Test cases with different broadcasting scenarios
@@ -47,15 +47,15 @@ class TestBinary:
 
         for shape1, shape2, expected_shape in test_cases:
             print(f"Testing shapes: {shape1}, {shape2} -> {expected_shape}")
-            np1 = np.random.randn(*shape1).astype(np.float32)
-            np2 = np.random.randn(*shape2).astype(np.float32)
+            np1 = generator.generate(shape1)
+            np2 = generator.generate(shape2)
             nx1 = from_numpy(np1)
             nx2 = from_numpy(np2)
             nx3: Array = op1(nx1, nx2)
             np3: np.ndarray = op2(np1, np2)
             np_assert_array(nx3, np3)
 
-    def binary_inplace(self, name: str, op1, op2):
+    def binary_inplace(self, name: str, op1, op2, generator: ArrayGenerator):
         print(f"{name} inplace:")
 
         test_cases = [
@@ -70,8 +70,8 @@ class TestBinary:
         for shape in test_cases:
             print(f"Testing shape: {shape}")
             # Generate inputs
-            np1 = np.random.randn(*shape).astype(np.float32)
-            np2 = np.random.randn(*shape).astype(np.float32)
+            np1 = generator.generate(shape)
+            np2 = generator.generate(shape)
 
             # Create arrays
             nx1 = from_numpy(np1)
@@ -86,7 +86,7 @@ class TestBinary:
             np3 = op2(np3, np2)  # Second time
             np_assert_array(nx3, np3)
 
-    def binary_inplace_broadcast(self, name: str, op1, op2):
+    def binary_inplace_broadcast(self, name: str, op1, op2, generator: ArrayGenerator):
         print(f"{name} inplace broadcast:")
 
         test_cases = [
@@ -104,8 +104,8 @@ class TestBinary:
             print(f"Testing: {shape1} @= {shape2}")
 
             # Generate inputs
-            np1 = np.random.randn(*shape1).astype(np.float32)
-            np2 = np.random.randn(*shape2).astype(np.float32)
+            np1 = generator.generate(shape1)
+            np2 = generator.generate(shape2)
 
             # Create arrays
             nx1 = from_numpy(np1)
@@ -118,59 +118,94 @@ class TestBinary:
             np_assert_array(nx3, np3)
 
     def test_add(self):
-        self.binary_no_broadcast("add", operator.add, operator.add)
+        self.binary_no_broadcast("add", operator.add, operator.add, RandnGenerator())
 
     def test_sub(self):
-        self.binary_no_broadcast("sub", operator.sub, operator.sub)
+        self.binary_no_broadcast("sub", operator.sub, operator.sub, RandnGenerator())
 
     def test_mul(self):
-        self.binary_no_broadcast("mul", operator.mul, operator.mul)
+        self.binary_no_broadcast("mul", operator.mul, operator.mul, RandnGenerator())
 
     def test_div(self):
-        self.binary_no_broadcast("div", operator.truediv, operator.truediv)
+        self.binary_no_broadcast(
+            "div", operator.truediv, operator.truediv, RandnGenerator()
+        )
+
+    def test_pow(self):
+        self.binary_no_broadcast(
+            "pow", operator.pow, operator.pow, UniformGenerator(low=1, high=10)
+        )
 
     def test_minimum(self):
         self.binary_no_broadcast(
-            "minimum", lambda x, y: x.minimum(y), lambda x, y: np.minimum(x, y)
+            "minimum",
+            lambda x, y: x.minimum(y),
+            lambda x, y: np.minimum(x, y),
+            RandnGenerator(),
         )
 
     def test_maximum(self):
         self.binary_no_broadcast(
-            "maximum", lambda x, y: x.maximum(y), lambda x, y: np.maximum(x, y)
+            "maximum",
+            lambda x, y: x.maximum(y),
+            lambda x, y: np.maximum(x, y),
+            RandnGenerator(),
         )
 
     def test_add_broadcast(self):
-        self.binary_with_broadcast("add", operator.add, operator.add)
+        self.binary_with_broadcast("add", operator.add, operator.add, RandnGenerator())
 
     def test_sub_broadcast(self):
-        self.binary_with_broadcast("sub", operator.sub, operator.sub)
+        self.binary_with_broadcast("sub", operator.sub, operator.sub, RandnGenerator())
 
     def test_mul_broadcast(self):
-        self.binary_with_broadcast("mul", operator.mul, operator.mul)
+        self.binary_with_broadcast("mul", operator.mul, operator.mul, RandnGenerator())
 
     def test_div_broadcast(self):
-        self.binary_with_broadcast("div", operator.truediv, operator.truediv)
+        self.binary_with_broadcast(
+            "div", operator.truediv, operator.truediv, RandnGenerator()
+        )
+
+    def test_pow_broadcast(self):
+        self.binary_with_broadcast(
+            "pow", operator.pow, operator.pow, UniformGenerator(low=1, high=10)
+        )
 
     def test_add_inplace(self):
-        self.binary_inplace("add", operator.iadd, operator.iadd)
+        self.binary_inplace("add", operator.iadd, operator.iadd, RandnGenerator())
 
     def test_sub_inplace(self):
-        self.binary_inplace("sub", operator.isub, operator.isub)
+        self.binary_inplace("sub", operator.isub, operator.isub, RandnGenerator())
 
     def test_mul_inplace(self):
-        self.binary_inplace("mul", operator.imul, operator.imul)
+        self.binary_inplace("mul", operator.imul, operator.imul, RandnGenerator())
 
     def test_div_inplace(self):
-        self.binary_inplace("div", operator.itruediv, operator.itruediv)
+        self.binary_inplace(
+            "div", operator.itruediv, operator.itruediv, RandnGenerator()
+        )
 
     def test_add_inplace_broadcast(self):
-        self.binary_inplace_broadcast("add", operator.iadd, operator.iadd)
+        self.binary_inplace_broadcast(
+            "add", operator.iadd, operator.iadd, RandnGenerator()
+        )
 
     def test_sub_inplace_broadcast(self):
-        self.binary_inplace_broadcast("sub", operator.isub, operator.isub)
+        self.binary_inplace_broadcast(
+            "sub", operator.isub, operator.isub, RandnGenerator()
+        )
 
     def test_mul_inplace_broadcast(self):
-        self.binary_inplace_broadcast("mul", operator.imul, operator.imul)
+        self.binary_inplace_broadcast(
+            "mul", operator.imul, operator.imul, RandnGenerator()
+        )
 
     def test_div_inplace_broadcast(self):
-        self.binary_inplace_broadcast("div", operator.itruediv, operator.itruediv)
+        self.binary_inplace_broadcast(
+            "div", operator.itruediv, operator.itruediv, RandnGenerator()
+        )
+
+    def test_pow_inplace_broadcast(self):
+        self.binary_inplace_broadcast(
+            "pow", operator.ipow, operator.ipow, UniformGenerator(low=1, high=10)
+        )

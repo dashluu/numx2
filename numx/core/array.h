@@ -162,6 +162,24 @@ namespace nx::core {
             return *this;
         }
 
+        Array pow(const Array &rhs) const { return Array(graph::pow(m_op, rhs.m_op)); }
+
+        template <NumericType T>
+        Array pow(T constant) const { return Array(graph::pow(m_op, constant)); }
+
+        Array &i_pow(const Array &rhs) {
+            m_op = graph::i_pow(m_op, rhs.m_op);
+            m_graph = nullptr;
+            return *this;
+        }
+
+        template <NumericType T>
+        Array &i_pow(T constant) {
+            m_op = graph::i_pow(m_op, constant);
+            m_graph = nullptr;
+            return *this;
+        }
+
         Array gemm(const Array &rhs) const { return Array(graph::gemm(m_op, rhs.m_op)); }
         Array exp(bool in_place = false) const { return Array(graph::exp(m_op, in_place)); }
         Array log(bool in_place = false) const { return Array(graph::log(m_op, in_place)); }

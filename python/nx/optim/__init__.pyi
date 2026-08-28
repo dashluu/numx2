@@ -21,3 +21,7 @@ class Optimizer:
 class SGD(Optimizer):
     def __init__(self, lr: float, momentum: float = 0.0, weight_decay: float = 0.0, dampening: float = 0.0, nesterov: bool = False) -> None:
         """Stochastic Gradient Descent optimizer"""
+
+class Adam(Optimizer):
+    def __init__(self, lr: float, beta1: float = 0.9, beta2: float = 0.999, epsilon: float = 1e-08, bias_correction: bool = False) -> None:
+        """Adam optimizer"""

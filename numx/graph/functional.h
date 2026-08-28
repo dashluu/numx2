@@ -8,7 +8,6 @@
 #include "reduce_op.h"
 #include "transform_op.h"
 #include "unary_op.h"
-#include <numbers>
 
 namespace nx::graph {
     using foundation::ArrayBuffer;
@@ -250,6 +249,8 @@ namespace nx::graph {
     inline OpPtr i_mul(OpPtr l_op, OpPtr r_op) { return in_place_binary<MulOp>(l_op, r_op, foundation::is_numeric); }
     inline OpPtr div(OpPtr l_op, OpPtr r_op) { return binary<DivOp>(l_op, r_op, foundation::is_numeric); }
     inline OpPtr i_div(OpPtr l_op, OpPtr r_op) { return in_place_binary<DivOp>(l_op, r_op, foundation::is_numeric); }
+    inline OpPtr pow(OpPtr l_op, OpPtr r_op) { return binary<PowOp>(l_op, r_op, foundation::is_float); }
+    inline OpPtr i_pow(OpPtr l_op, OpPtr r_op) { return in_place_binary<PowOp>(l_op, r_op, foundation::is_float); }
     inline OpPtr logic_and(OpPtr l_op, OpPtr r_op) { return binary<LogicAndOp>(l_op, r_op, foundation::is_bool); }
     inline OpPtr i_logic_and(OpPtr l_op, OpPtr r_op) { return in_place_binary<LogicAndOp>(l_op, r_op, foundation::is_bool); }
     inline OpPtr logic_or(OpPtr l_op, OpPtr r_op) { return binary<LogicOrOp>(l_op, r_op, foundation::is_bool); }
@@ -298,6 +299,12 @@ namespace nx::graph {
 
     template <NumericType T>
     OpPtr i_div(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, i_div); }
+
+    template <NumericType T>
+    OpPtr pow(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, pow); }
+
+    template <NumericType T>
+    OpPtr i_pow(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, i_pow); }
 
     template <NumericType T>
     OpPtr bitwise_and(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, bitwise_and); }

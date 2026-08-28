@@ -22,6 +22,11 @@ struct Div {
     T operator()(T lhs, T rhs) { return lhs / rhs; }
 };
 
+struct Pow {
+    template <class T>
+    T operator()(T lhs, T rhs) { return metal::pow(lhs, rhs); }
+};
+
 struct LogicAnd {
     bool operator()(bool lhs, bool rhs) { return lhs && rhs; }
 };
