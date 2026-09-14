@@ -126,7 +126,6 @@ namespace nx::graph {
     OpPtr copy(OpPtr in_op);
     inline OpPtr sq(OpPtr in_op, bool in_place = false) { return unary<SqOp>(in_op, foundation::is_numeric, in_place); }
     inline OpPtr neg(OpPtr in_op, bool in_place = false) { return unary<NegOp>(in_op, foundation::is_numeric, in_place); }
-    inline OpPtr logic_not(OpPtr in_op, bool in_place = false) { return unary<LogicNot>(in_op, foundation::is_bool, in_place); }
     inline OpPtr bitwise_not(OpPtr in_op, bool in_place = false) { return unary<BitwiseNot>(in_op, foundation::is_int, in_place); }
     inline OpPtr sqrt(OpPtr in_op, bool in_place = false) { return float_unary<SqrtOp>(in_op, in_place); }
     inline OpPtr exp(OpPtr in_op, bool in_place = false) { return float_unary<ExpOp>(in_op, in_place); }
@@ -251,10 +250,6 @@ namespace nx::graph {
     inline OpPtr i_div(OpPtr l_op, OpPtr r_op) { return in_place_binary<DivOp>(l_op, r_op, foundation::is_numeric); }
     inline OpPtr pow(OpPtr l_op, OpPtr r_op) { return binary<PowOp>(l_op, r_op, foundation::is_float); }
     inline OpPtr i_pow(OpPtr l_op, OpPtr r_op) { return in_place_binary<PowOp>(l_op, r_op, foundation::is_float); }
-    inline OpPtr logic_and(OpPtr l_op, OpPtr r_op) { return binary<LogicAndOp>(l_op, r_op, foundation::is_bool); }
-    inline OpPtr i_logic_and(OpPtr l_op, OpPtr r_op) { return in_place_binary<LogicAndOp>(l_op, r_op, foundation::is_bool); }
-    inline OpPtr logic_or(OpPtr l_op, OpPtr r_op) { return binary<LogicOrOp>(l_op, r_op, foundation::is_bool); }
-    inline OpPtr i_logic_or(OpPtr l_op, OpPtr r_op) { return in_place_binary<LogicOrOp>(l_op, r_op, foundation::is_bool); }
     inline OpPtr bitwise_and(OpPtr l_op, OpPtr r_op) { return binary<BitwiseAndOp>(l_op, r_op, foundation::is_int); }
     inline OpPtr i_bitwise_and(OpPtr l_op, OpPtr r_op) { return in_place_binary<BitwiseAndOp>(l_op, r_op, foundation::is_int); }
     inline OpPtr bitwise_or(OpPtr l_op, OpPtr r_op) { return binary<BitwiseOrOp>(l_op, r_op, foundation::is_int); }
@@ -313,22 +308,10 @@ namespace nx::graph {
     OpPtr i_bitwise_and(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, i_bitwise_and); }
 
     template <NumericType T>
-    OpPtr logic_and(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, logic_and); }
-
-    template <NumericType T>
-    OpPtr i_logic_and(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, i_logic_and); }
-
-    template <NumericType T>
     OpPtr bitwise_or(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, bitwise_or); }
 
     template <NumericType T>
     OpPtr i_bitwise_or(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, i_bitwise_or); }
-
-    template <NumericType T>
-    OpPtr logic_or(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, logic_or); }
-
-    template <NumericType T>
-    OpPtr i_logic_or(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, i_logic_or); }
 
     template <NumericType T>
     OpPtr bitwise_xor(OpPtr l_op, T constant) { return binary_with_scalar(l_op, constant, bitwise_xor); }

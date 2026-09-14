@@ -1,7 +1,7 @@
 import numpy as np
 import nx.nn as nn
 import torch
-from nx.core import arange, from_numpy, i32
+from nx.core import arange, b8, from_numpy, i32
 from typing_extensions import Sequence
 from utils import np_assert_array
 

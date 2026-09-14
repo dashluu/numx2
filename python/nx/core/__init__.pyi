@@ -258,6 +258,61 @@ class Array:
     def __ge__(self, rhs: object) -> Array:
         """Element-wise greater than or equal comparison"""
 
+    def bitwise_not(self, in_place: bool = False) -> Array:
+        """
+        Element-wise bitwise not if the array type is integral and logical not if the array type is boolean
+        """
+
+    def __invert__(self) -> Array:
+        """
+        Element-wise bitwise not if the array type is integral and logical not if the array type is boolean
+        """
+
+    def __and__(self, rhs: object) -> Array:
+        """
+        Element-wise bitwise and if the array type is integral and logical and if the array type is boolean
+        """
+
+    def __or__(self, rhs: object) -> Array:
+        """
+        Element-wise bitwise or if the array type is integral and logical or if the array type is boolean
+        """
+
+    def __xor__(self, rhs: object) -> Array:
+        """
+        Element-wise bitwise xor if the array type is integral and logical xor if the array type is boolean
+        """
+
+    def __rand__(self, rhs: object) -> Array:
+        """
+        Element-wise bitwise and if the array type is integral and logical and if the array type is boolean
+        """
+
+    def __ror__(self, rhs: object) -> Array:
+        """
+        Element-wise bitwise or if the array type is integral and logical or if the array type is boolean
+        """
+
+    def __rxor__(self, rhs: object) -> Array:
+        """
+        Element-wise bitwise xor if the array type is integral and logical xor if the array type is boolean
+        """
+
+    def __iand__(self, rhs: object) -> Array:
+        """
+        In-place element-wise bitwise and if the array type is integral and logical and if the array type is boolean
+        """
+
+    def __ior__(self, rhs: object) -> Array:
+        """
+        In-place element-wise bitwise or if the array type is integral and logical or if the array type is boolean
+        """
+
+    def __ixor__(self, rhs: object) -> Array:
+        """
+        In-place element-wise bitwise xor if the array type is integral and logical xor if the array type is boolean
+        """
+
     def minimum(self, rhs: object) -> Array:
         """Element-wise minimum comparison"""
 

@@ -101,6 +101,32 @@ namespace nx::bind {
         throw nxf::NanobindInvalidArgumentType("float, int, bool, Array", py_class_name(rhs));
     }
 
+    template <class F>
+    Array int_bool_binary(const Array &array, const nb::object &rhs, F &&f) {
+        if (nb::isinstance<Array>(rhs)) {
+            return f(array, nb::cast<Array>(rhs));
+        } else if (nb::isinstance<nb::int_>(rhs)) {
+            return f(array, nb::cast<int>(rhs));
+        } else if (nb::isinstance<nb::bool_>(rhs)) {
+            return f(array, nb::cast<bool>(rhs));
+        }
+
+        throw nxf::NanobindInvalidArgumentType("int, bool, Array", py_class_name(rhs));
+    }
+
+    template <class F>
+    Array in_place_int_bool_binary(Array &array, const nb::object &rhs, F &&f) {
+        if (nb::isinstance<Array>(rhs)) {
+            return f(array, nb::cast<Array>(rhs));
+        } else if (nb::isinstance<nb::int_>(rhs)) {
+            return f(array, nb::cast<int>(rhs));
+        } else if (nb::isinstance<nb::bool_>(rhs)) {
+            return f(array, nb::cast<bool>(rhs));
+        }
+
+        throw nxf::NanobindInvalidArgumentType("int, bool, Array", py_class_name(rhs));
+    }
+
     usize py_index(usize len, isize index);
     ShapeDims py_indices(usize len, ShapeDims &dims);
     Range slice_to_range(usize len, const nb::object &slice);
@@ -196,6 +222,32 @@ namespace nx::bind {
 
     inline Array geq(const Array &array, const nb::object &rhs) {
         return binary(array, rhs, [](const auto &a, const auto &b) { return a >= b; });
+    }
+
+    inline Array bitwise_logic_not(const Array &array) { return ~array; }
+
+    inline Array bitwise_and(const Array &array, const nb::object &rhs) {
+        return int_bool_binary(array, rhs, [](const auto &a, const auto &b) { return a & b; });
+    }
+
+    inline Array i_bitwise_and(Array &array, const nb::object &rhs) {
+        return in_place_int_bool_binary(array, rhs, [](auto &a, const auto &b) { return a &= b; });
+    }
+
+    inline Array bitwise_or(const Array &array, const nb::object &rhs) {
+        return int_bool_binary(array, rhs, [](const auto &a, const auto &b) { return a | b; });
+    }
+
+    inline Array i_bitwise_or(Array &array, const nb::object &rhs) {
+        return in_place_int_bool_binary(array, rhs, [](auto &a, const auto &b) { return a |= b; });
+    }
+
+    inline Array bitwise_xor(const Array &array, const nb::object &rhs) {
+        return int_bool_binary(array, rhs, [](const auto &a, const auto &b) { return a ^ b; });
+    }
+
+    inline Array i_bitwise_xor(Array &array, const nb::object &rhs) {
+        return in_place_int_bool_binary(array, rhs, [](auto &a, const auto &b) { return a ^= b; });
     }
 
     inline Array minimum(const Array &array, const nb::object &rhs) {

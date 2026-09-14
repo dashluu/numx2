@@ -9,6 +9,8 @@ namespace nx::core {
     using foundation::Device;
     using foundation::DType;
     using foundation::f32;
+    using foundation::IntType;
+    using foundation::IntBoolType;
     using foundation::isize;
     using foundation::NumericOrBoolType;
     using foundation::NumericType;
@@ -196,6 +198,11 @@ namespace nx::core {
         Array operator>(const Array &rhs) const { return Array(graph::greater(m_op, rhs.m_op)); }
         Array operator<=(const Array &rhs) const { return Array(graph::leq(m_op, rhs.m_op)); }
         Array operator>=(const Array &rhs) const { return Array(graph::geq(m_op, rhs.m_op)); }
+        Array bitwise_not(bool in_place = false) const { return Array(graph::bitwise_not(m_op, in_place)); }
+        Array operator~() const { return Array(graph::bitwise_not(m_op)); }
+        Array operator&(const Array &rhs) const { return Array(graph::bitwise_and(m_op, rhs.m_op)); }
+        Array operator|(const Array &rhs) const { return Array(graph::bitwise_or(m_op, rhs.m_op)); }
+        Array operator^(const Array &rhs) const { return Array(graph::bitwise_xor(m_op, rhs.m_op)); }
         Array minimum(const Array &rhs) const { return Array(graph::minimum(m_op, rhs.m_op)); }
         Array maximum(const Array &rhs) const { return Array(graph::maximum(m_op, rhs.m_op)); }
 
@@ -216,6 +223,54 @@ namespace nx::core {
 
         template <NumericType T>
         Array operator>=(T constant) const { return Array(graph::geq(m_op, constant)); }
+
+        template <IntBoolType T>
+        Array operator&(T constant) const { return Array(graph::bitwise_and(m_op, constant)); }
+
+        Array &operator&=(const Array &rhs) {
+            m_op = graph::i_bitwise_and(m_op, rhs.m_op);
+            m_graph = nullptr;
+            return *this;
+        }
+
+        template <IntBoolType T>
+        Array &operator&=(T constant) {
+            m_op = graph::i_bitwise_and(m_op, constant);
+            m_graph = nullptr;
+            return *this;
+        }
+
+        template <IntBoolType T>
+        Array operator|(T constant) const { return Array(graph::bitwise_or(m_op, constant)); }
+
+        Array &operator|=(const Array &rhs) {
+            m_op = graph::i_bitwise_or(m_op, rhs.m_op);
+            m_graph = nullptr;
+            return *this;
+        }
+
+        template <IntBoolType T>
+        Array &operator|=(T constant) {
+            m_op = graph::i_bitwise_or(m_op, constant);
+            m_graph = nullptr;
+            return *this;
+        }
+
+        template <IntBoolType T>
+        Array operator^(T constant) const { return Array(graph::bitwise_xor(m_op, constant)); }
+
+        Array &operator^=(const Array &rhs) {
+            m_op = graph::i_bitwise_xor(m_op, rhs.m_op);
+            m_graph = nullptr;
+            return *this;
+        }
+
+        template <IntBoolType T>
+        Array &operator^=(T constant) {
+            m_op = graph::i_bitwise_xor(m_op, constant);
+            m_graph = nullptr;
+            return *this;
+        }
 
         template <NumericType T>
         Array minimum(T constant) const { return Array(graph::minimum(m_op, constant)); }

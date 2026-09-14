@@ -34,12 +34,12 @@ namespace nx::runtime::metal {
         static constexpr usize s_strided_gemm2d_buffer_count = 8;
         static constexpr usize s_tensor_gemm2d_buffer_count = 8;
         static constexpr usize s_tensor_gemm2d_tile_size = 32;
-        static constexpr usize s_tensor_gemm2d_simdgroups = 2;
+        static constexpr usize s_tensor_gemm2d_simdgroups = 8;
         static constexpr usize s_contiguous_gemm3d_buffer_count = 7;
         static constexpr usize s_strided_gemm3d_buffer_count = 9;
         static constexpr usize s_tensor_gemm3d_buffer_count = 10;
         static constexpr usize s_tensor_gemm3d_tile_size = 32;
-        static constexpr usize s_tensor_gemm3d_simdgroups = 2;
+        static constexpr usize s_tensor_gemm3d_simdgroups = 8;
         static constexpr usize s_contiguous_reduce_all_buffer_count = 4;
         static constexpr usize s_strided_reduce_all_buffer_count = 7;
         static constexpr usize s_contiguous_reduce_col_buffer_count = 4;

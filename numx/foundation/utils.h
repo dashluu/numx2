@@ -25,10 +25,13 @@ namespace nx::foundation {
     concept NumericOrBoolType = std::is_arithmetic_v<T> || std::is_same_v<T, bool>;
 
     template <class T>
-    concept IntegerType = std::integral<T> && !std::same_as<T, bool>;
+    concept IntType = std::integral<T> && !std::same_as<T, bool>;
 
     template <class T>
     concept FloatType = std::floating_point<T>;
+
+    template <class T>
+    concept IntBoolType = std::integral<T>;
 
     static usize align_to(usize x, usize target) { return (x + target - 1) / target * target; }
 

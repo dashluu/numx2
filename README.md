@@ -94,7 +94,7 @@ There are a few more modules than just `core`:
   - Random operations: `uniform`, `normal`, `kaiming_uniform`, `randint`, `randbool`
   - Array transformation operations: `reshape`, `permute`, `slice`, `transpose`
   - Matrix multiplication `matmul`
-  - Element-wise operations: `add`, `sub`, `mul`, `div`, `pow`, `exp`, `log`, `neg`(negation), `recip`(reciprocal), `sqrt`, `sq`(square)
+  - Element-wise operations: `add`, `sub`, `mul`, `div`, `pow`, `exp`, `log`, `neg`(negation), `recip`(reciprocal), `sqrt`, `sq`(square), `bitwise_and`, `bitwise_or`, `bitwise_xor`
   - Reduction operations: `sum`, `mean`, `max`, `min`, `argmax`, `argmin`
 - NumPy, PyTorch integration:
   - `from_numpy` converts a numpy array to numx array.

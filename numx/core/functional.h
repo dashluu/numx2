@@ -8,7 +8,7 @@ namespace nx::core {
     using foundation::default_device_kind;
     using foundation::i32;
     using foundation::IncompatDTypeForRandomFunction;
-    using foundation::IntegerType;
+    using foundation::IntType;
     using foundation::uone;
 
     template <NumericType T>
@@ -63,7 +63,7 @@ namespace nx::core {
         return Array(graph::normal(view, key_gen, mean, std, dtype, device, is_param), runtime);
     }
 
-    template <IntegerType T>
+    template <IntType T>
     Array randint(const ShapeView &view, T low = T(0), T high = T(10), const DType *dtype = &i32, DeviceKind device_kind = default_device_kind, usize device_id = default_device_id, bool is_param = false) {
         if (!is_int(dtype)) {
             throw IncompatDTypeForRandomFunction("randint", "int", dtype->str());

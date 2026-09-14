@@ -223,7 +223,7 @@ kernel void tensor_gemm3d(
 }
 
 #define def_tensor_gemm(dtype, T, R)    \
-template [[host_name("tensor_gemm2d_" #dtype)]] [[kernel]] decltype(tensor_gemm2d<T, R, 32, 2, 4>) tensor_gemm2d<T, R, 32, 2, 4>;   \
-template [[host_name("tensor_gemm3d_" #dtype)]] [[kernel]] decltype(tensor_gemm3d<T, R, 32, 2, 4>) tensor_gemm3d<T, R, 32, 2, 4>;
+template [[host_name("tensor_gemm2d_" #dtype)]] [[kernel]] decltype(tensor_gemm2d<T, R, 32, 8, 2>) tensor_gemm2d<T, R, 32, 8, 2>;   \
+template [[host_name("tensor_gemm3d_" #dtype)]] [[kernel]] decltype(tensor_gemm3d<T, R, 32, 8, 2>) tensor_gemm3d<T, R, 32, 8, 2>;
 
 def_tensor_gemm(f32, float, float)
