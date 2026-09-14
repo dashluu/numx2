@@ -61,19 +61,14 @@ x4.backward()
 Check out an example of `main.py` inside `python` directory:
 ```python
 from numx.core import Array, f32, zeros, ones
-from numx.profiler import enable_memory_profile, save_memory_profile
 import numpy as np
 import torch
 
-# Enable memory profiling
-enable_memory_profile()
 arr1 = zeros([2, 5, 3])
 arr2 = arr1[:, 1:4]
 arr2 += ones([2, 3, 3])
 # print triggers the computational graph to be compiled and executed
 print(arr2)
-# Save memory profile to a file
-save_memory_profile("memory_profile.json")
 ```
 
 There are a few more modules than just `core`:
@@ -81,12 +76,10 @@ There are a few more modules than just `core`:
 * `random` contains random number generating functions such as `normal`, `uniform`, etc.
 * `nn` contains important modules and functions to implement neural networks such as `linear`, `onehot`, etc.
 * `optim` contains optimizer implementations for updating neural network parameters.
-* `profiler` contains memory and graph profiler(still in development).
 
 ## Features
 - Automatic differentiation
-- Native Metal GPU acceleration for Apple Silicon
-- Comprehensive memory profiler (peak usage, leak detection, pool allocation)
+- Native Metal GPU v4 acceleration for Apple Silicon
 - Custom compute kernels written from scratch
 - Full computational graph forward and backward propagation
 - Supported operations:
@@ -104,6 +97,21 @@ There are a few more modules than just `core`:
 - **Modules**: Linear
 - **Loss functions**: Cross-entropy Loss
 - **Optimizers**: vanilla Gradient Descent
+
+## Changes compared to v1
+- Memory allocator: replaced hash maps with vectors for better cache locality
+- Metal 4 migration: adopted argument tables and residency sets
+- Matmul rewrite: reimplemented using Metal 4 tensor operations, on par with the previous hand-tuned kernel and automatically leverages the new neural accelerator on newer devices
+
+## Todos
+- [ ] Memory profiler to detect memory leaks
+- [ ] `cat` tensor operation
+- [ ] `stack` tensor operation
+- [ ] Embedding layer
+- [ ] Support more activation functions
+- [ ] Support more optimizers
+- [ ] Kernel fusion
+- [ ] Asynchronous dispatch support
 
 ## Examples
 - Check out the `python/tests` directory for example implementations of:
