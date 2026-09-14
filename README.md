@@ -99,9 +99,9 @@ There are a few more modules than just `core`:
 - **Optimizers**: vanilla Gradient Descent
 
 ## Changes compared to v1
-- Memory allocator: replaced hash maps with vectors for better cache locality
-- Metal 4 migration: adopted argument tables and residency sets
-- Matmul rewrite: reimplemented using Metal 4 tensor operations, on par with the previous hand-tuned kernel and automatically leverages the new neural accelerator on newer devices
+- **Memory allocator**: replaced hash maps with vectors for better cache locality.
+- **Metal 4 migration**: adopted argument tables and residency sets.
+- **Matmul rewrite**: reimplemented using Metal 4 tensor operations, on par with the previous hand-tuned kernel and automatically leverages the new neural accelerator on newer devices.
 
 ## Todos
 - [ ] Memory profiler to detect memory leaks
